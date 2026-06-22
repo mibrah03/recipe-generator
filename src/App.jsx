@@ -31,6 +31,7 @@ const QUICK_CHIPS = [
   { label: "🥩 American", value: "American" },{ label: "🫕 Greek", value: "Greek" },
   { label: "🍜 Thai", value: "Thai" },{ label: "🥘 Korean", value: "Korean" },
   { label: "🦞 Singaporean", value: "Singaporean" },{ label: "🥗 Lebanese", value: "Lebanese" },
+  { label: "🍲 Malaysian", value: "Malaysian" },
 ];
 
 const MEAL_STYLES = [
@@ -240,15 +241,7 @@ export default function App() {
   // Cuisine of the day
   const todayCuisine = ALL_CUISINES[new Date().getDate() % ALL_CUISINES.length];
 
-  const isFav = recipe ? favourites.some(f => f.name === recipe.name) : false;
 
-  const toggleFav = () => {
-    if (!recipe) return;
-    let next;
-    if (isFav) { next = favourites.filter(f => f.name !== recipe.name); }
-    else { next = [{ ...recipe, image: recipeImage, savedAt: Date.now() }, ...favourites]; }
-    setFavourites(next); save("favourites", next);
-  };
 
   const addToPlan = (day) => {
     if (!recipe) return;
@@ -632,8 +625,7 @@ export default function App() {
                 <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,transparent 40%,#121218 100%)" }} />
                 {/* Action buttons overlay */}
                 <div style={{ position: "absolute", top: 14, right: 14, display: "flex", gap: 8 }}>
-                  <button onClick={toggleFav} style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, cursor: "pointer" }}>{isFav ? "❤️" : "🤍"}</button>
-                  <button onClick={shareRecipe} style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "0 12px", height: 36, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>{shareMsg || "📤"}</button>
+                  <button onClick={shareRecipe} style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "0 12px", height: 36, color: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>{shareMsg || "📤 Share"}</button>
                 </div>
               </div>
 
@@ -646,19 +638,12 @@ export default function App() {
                   {[{ icon:"⏱", label:`${recipe.time} min` },{ icon:"📊", label:recipe.difficulty },{ icon:"👥", label:`${servings} servings` }].map((s,i) => <div key={i} style={{ background: "rgba(255,122,0,0.08)", border: "1px solid rgba(255,122,0,0.2)", borderRadius: 20, padding: "5px 12px", fontSize: 12, color: "#FFC857", fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>{s.icon} {s.label}</div>)}
                 </div>
 
-                {/* Serving adjuster */}
-                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "12px 16px", marginBottom: 16 }}>
-                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", flex: 1 }}>Adjust servings</span>
-                  <button onClick={() => setServings(Math.max(1, servings - 1))} style={{ width: 28, height: 28, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 16, cursor: "pointer" }}>−</button>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "#FF7A00", minWidth: 24, textAlign: "center" }}>{servings}</span>
-                  <button onClick={() => setServings(servings + 1)} style={{ width: 28, height: 28, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 16, cursor: "pointer" }}>+</button>
-                </div>
+
 
                 {/* Ingredients */}
                 <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <div style={{ marginBottom: 12 }}>
                     <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,122,0,0.8)", textTransform: "uppercase", letterSpacing: 1.5 }}>Ingredients</p>
-                    <button onClick={() => setShowShopping(true)} style={{ background: "rgba(255,122,0,0.1)", border: "1px solid rgba(255,122,0,0.25)", borderRadius: 20, padding: "4px 10px", color: "#FF7A00", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>🛒 Shopping List</button>
                   </div>
                   {recipe.ingredients.map((ing, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: i < recipe.ingredients.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
@@ -687,12 +672,7 @@ export default function App() {
 
                 {recipe.tip && <div style={{ background: "linear-gradient(135deg,rgba(255,122,0,0.08),rgba(255,200,87,0.06))", border: "1px solid rgba(255,122,0,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 16 }}><span style={{ fontWeight: 700, color: "#FF7A00", fontSize: 12 }}>👨‍🍳 Chef's Tip  </span><span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.6 }}>{recipe.tip}</span></div>}
 
-                {/* Feedback */}
-                <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
-                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", flex: 1, alignSelf: "center" }}>Was this good?</p>
-                  <button onClick={() => regenerateFromFeedback("up")} style={{ background: feedback === "up" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.05)", border: "1px solid " + (feedback === "up" ? "rgba(52,211,153,0.4)" : "rgba(255,255,255,0.1)"), borderRadius: 20, padding: "6px 14px", color: feedback === "up" ? "#34d399" : "#888", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>👍</button>
-                  <button onClick={() => regenerateFromFeedback("down")} style={{ background: feedback === "down" ? "rgba(255,80,80,0.1)" : "rgba(255,255,255,0.05)", border: "1px solid " + (feedback === "down" ? "rgba(255,80,80,0.3)" : "rgba(255,255,255,0.1)"), borderRadius: 20, padding: "6px 14px", color: feedback === "down" ? "#ff6b6b" : "#888", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>👎 Try Another</button>
-                </div>
+
 
                 {/* Add to Plan */}
                 <div style={{ marginBottom: 14 }}>
@@ -714,7 +694,6 @@ export default function App() {
             </div>
           )}
 
-          {showShopping && recipe && <ShoppingList ingredients={recipe.ingredients.map(i => scaleIngredient(i, recipe.servings))} onClose={() => setShowShopping(false)} />}
 
           {/* ── EAT OUT RESULTS ── */}
           {restaurants && (
@@ -763,7 +742,6 @@ export default function App() {
         <div style={{ display: "flex", maxWidth: 600, margin: "0 auto" }}>
           {[
             { id:"home", icon:"🏠", label:"Home" },
-            { id:"favourites", icon:"❤️", label:"Saved" },
             { id:"planner", icon:"📅", label:"Planner" },
             { id:"preferences", icon:"⚙️", label:"Settings" },
           ].map(nav => (
