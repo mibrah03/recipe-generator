@@ -237,6 +237,149 @@ function CookingMode({ recipe, onClose }) {
   );
 }
 
+
+// ── DISH DETAIL MODAL ────────────────────────────────────────────────────────
+function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
+  const [info, setInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetch_ = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+          body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 600, messages: [{ role: "user", content: `Tell me about the ${cuisine} dish called "${dish}" from a ${restaurantName}. Respond ONLY with JSON: {"description":"2 sentence description of this dish","taste":"Flavor profile in one sentence","ingredients":["main ingredient 1","main ingredient 2","main ingredient 3","main ingredient 4"],"allergens":["gluten","dairy etc if any"],"spiceLevel":"Mild / Medium / Hot / Very Hot","calories":"approximate calories per serving"}` }] })
+        });
+        const data = await res.json();
+        const parsed = JSON.parse(data.content.map(i => i.text || "").join("").replace(/```json|```/g, "").trim());
+        setInfo(parsed);
+      } catch(e) {}
+      setLoading(false);
+    };
+    fetch_();
+  }, [dish]);
+
+  const spiceColors = { "Mild": "#34d399", "Medium": "#FFC857", "Hot": "#FF7A00", "Very Hot": "#ef4444" };
+
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.9)", zIndex:2000, display:"flex", alignItems:"flex-end", backdropFilter:"blur(8px)", fontFamily:"'Inter',system-ui,sans-serif" }} onClick={onClose}>
+      <div style={{ width:"100%", maxWidth:600, margin:"0 auto", background:"#121218", borderRadius:"24px 24px 0 0", overflow:"hidden", maxHeight:"90vh", display:"flex", flexDirection:"column" }} onClick={e => e.stopPropagation()}>
+        {/* Image */}
+        <div style={{ position:"relative", height:220, background:"#1A1A22", flexShrink:0 }}>
+          {image ? <img src={image} alt={dish} style={{ width:"100%", height:"100%", objectFit:"cover" }} /> : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:64 }}>🍽️</div>}
+          <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,transparent 40%,#121218 100%)" }} />
+          <button onClick={onClose} style={{ position:"absolute", top:14, right:14, background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:"50%", width:34, height:34, color:"#fff", fontSize:16, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+        </div>
+
+        {/* Content */}
+        <div style={{ padding:"20px 20px 36px", overflowY:"auto" }}>
+          <h2 style={{ fontSize:22, fontWeight:800, color:"#fff", marginBottom:4 }}>{dish}</h2>
+          <p style={{ fontSize:12, color:"rgba(255,122,0,0.7)", fontWeight:600, marginBottom:16 }}>{restaurantName} · {cuisine}</p>
+
+          {loading ? (
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              {[120,80,100].map((w,i) => <div key={i} style={{ height:14, borderRadius:7, background:"linear-gradient(90deg,#1A1A22 25%,#242430 50%,#1A1A22 75%)", backgroundSize:"200% 100%", animation:"shimmer 1.5s infinite", width:w+"%" }} />)}
+            </div>
+          ) : info ? (
+            <>
+              <p style={{ fontSize:14, color:"rgba(255,255,255,0.6)", lineHeight:1.7, marginBottom:16 }}>{info.description}</p>
+
+              {/* Meta row */}
+              <div style={{ display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" }}>
+                {info.calories && <div style={{ background:"rgba(255,122,0,0.08)", border:"1px solid rgba(255,122,0,0.2)", borderRadius:20, padding:"5px 12px", fontSize:12, color:"#FFC857", fontWeight:600 }}>🔥 ~{info.calories}</div>}
+                {info.spiceLevel && <div style={{ background:`${spiceColors[info.spiceLevel] || "#FF7A00"}18`, border:`1px solid ${spiceColors[info.spiceLevel] || "#FF7A00"}40`, borderRadius:20, padding:"5px 12px", fontSize:12, color:spiceColors[info.spiceLevel] || "#FF7A00", fontWeight:600 }}>🌶 {info.spiceLevel}</div>}
+              </div>
+
+              {/* Taste */}
+              {info.taste && (
+                <div style={{ background:"rgba(255,255,255,0.03)", borderRadius:12, padding:"12px 14px", marginBottom:14 }}>
+                  <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,122,0,0.8)", textTransform:"uppercase", letterSpacing:1.2, marginBottom:6 }}>Taste Profile</p>
+                  <p style={{ fontSize:13, color:"rgba(255,255,255,0.6)", lineHeight:1.6 }}>{info.taste}</p>
+                </div>
+              )}
+
+              {/* Key ingredients */}
+              {info.ingredients?.length > 0 && (
+                <div style={{ marginBottom:14 }}>
+                  <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,122,0,0.8)", textTransform:"uppercase", letterSpacing:1.2, marginBottom:8 }}>Key Ingredients</p>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                    {info.ingredients.map((ing,i) => <span key={i} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"4px 12px", fontSize:12, color:"rgba(255,255,255,0.55)" }}>{ing}</span>)}
+                  </div>
+                </div>
+              )}
+
+              {/* Allergens */}
+              {info.allergens?.length > 0 && (
+                <div style={{ background:"rgba(255,80,80,0.06)", border:"1px solid rgba(255,80,80,0.15)", borderRadius:12, padding:"10px 14px" }}>
+                  <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,80,80,0.7)", textTransform:"uppercase", letterSpacing:1.2, marginBottom:6 }}>⚠️ Allergens</p>
+                  <p style={{ fontSize:12, color:"rgba(255,255,255,0.4)" }}>{info.allergens.join(", ")}</p>
+                </div>
+              )}
+            </>
+          ) : <p style={{ color:"rgba(255,255,255,0.3)", fontSize:13 }}>Could not load dish info.</p>}
+
+          {/* Order links */}
+          <div style={{ marginTop:20, display:"flex", gap:8 }}>
+            <a href={`https://www.ubereats.com/search?q=${encodeURIComponent(dish)}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(6,181,93,0.1)", border:"1px solid rgba(6,181,93,0.3)", borderRadius:12, padding:"11px 6px", color:"#06B55D", fontSize:12, fontWeight:700 }}>🟢 Uber Eats</a>
+            <a href={`https://www.doordash.com/search/store/${encodeURIComponent(dish)}/`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(255,60,60,0.1)", border:"1px solid rgba(255,60,60,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF3C3C", fontSize:12, fontWeight:700 }}>🔴 DoorDash</a>
+            <a href={`https://www.grubhub.com/search?queryText=${encodeURIComponent(dish)}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(255,153,0,0.1)", border:"1px solid rgba(255,153,0,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF9900", fontSize:12, fontWeight:700 }}>🟡 GrubHub</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── DISH MENU ─────────────────────────────────────────────────────────────────
+function DishMenu({ dishes, restaurantName, dishImages, cuisine }) {
+  const [expanded, setExpanded] = useState(false);
+  const [selectedDish, setSelectedDish] = useState(null);
+  const visible = expanded ? dishes : dishes.slice(0, 4);
+
+  return (
+    <div style={{ padding:"14px 18px" }}>
+      {selectedDish && (
+        <DishDetail
+          dish={selectedDish}
+          image={dishImages[selectedDish]}
+          restaurantName={restaurantName}
+          cuisine={cuisine}
+          onClose={() => setSelectedDish(null)}
+        />
+      )}
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+        <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,122,0,0.8)", textTransform:"uppercase", letterSpacing:1.5 }}>🍴 Signature Dishes</p>
+        <span style={{ fontSize:11, color:"rgba(255,255,255,0.3)" }}>Tap to view details</span>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+        {visible.map((dish,j) => (
+          <div key={j} onClick={() => setSelectedDish(dish)} style={{ display:"flex", alignItems:"center", gap:12, background:"rgba(255,255,255,0.03)", borderRadius:12, border:"1px solid rgba(255,255,255,0.06)", overflow:"hidden", cursor:"pointer", transition:"all 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.border="1px solid rgba(255,122,0,0.3)"}
+            onMouseLeave={e => e.currentTarget.style.border="1px solid rgba(255,255,255,0.06)"}>
+            <div style={{ width:72, height:72, flexShrink:0, background:"#1A1A22", overflow:"hidden", position:"relative" }}>
+              {dishImages[dish]
+                ? <img src={dishImages[dish]} alt={dish} style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => e.currentTarget.style.display="none"} />
+                : <div style={{ width:"100%", height:"100%", background:"linear-gradient(90deg,#1A1A22 25%,#242430 50%,#1A1A22 75%)", backgroundSize:"200% 100%", animation:"shimmer 1.5s infinite" }} />}
+            </div>
+            <div style={{ flex:1, padding:"0 4px 0 0" }}>
+              <p style={{ fontSize:13, fontWeight:600, color:"#fff", marginBottom:2 }}>{dish}</p>
+              <p style={{ fontSize:11, color:"rgba(255,255,255,0.25)" }}>{restaurantName}</p>
+            </div>
+            <span style={{ color:"rgba(255,122,0,0.5)", fontSize:16, paddingRight:14 }}>›</span>
+          </div>
+        ))}
+      </div>
+      {dishes.length > 4 && (
+        <button onClick={() => setExpanded(!expanded)} style={{ width:"100%", marginTop:10, padding:"10px", borderRadius:10, border:"1px solid rgba(255,255,255,0.07)", background:"rgba(255,255,255,0.03)", color:"rgba(255,255,255,0.4)", fontSize:12, fontWeight:600, cursor:"pointer" }}>
+          {expanded ? "Show Less ↑" : `Show All ${dishes.length} Dishes ↓`}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 export default function App() {
   const [tab, setTab] = useState("cook");
@@ -360,7 +503,7 @@ export default function App() {
       const parsed = JSON.parse(text);
       setRestaurants(parsed.restaurants);
       const imgs = {};
-      for (const r of parsed.restaurants) { for (const dish of r.mustOrder) { if (!imgs[dish]) { const img = await fetchDishImage(dish); if (img) imgs[dish] = img; } } }
+      for (const r of parsed.restaurants) { const dishes = r.menu || r.mustOrder || []; for (const dish of dishes) { if (!imgs[dish]) { const img = await fetchDishImage(dish); if (img) imgs[dish] = img; } } }
       setDishImages(imgs);
     } catch(err) { setError("Something went wrong. Try again!"); }
     setLoading(false);
@@ -622,30 +765,14 @@ export default function App() {
                   <p style={{ fontSize:12, color:"rgba(255,255,255,0.3)", lineHeight:1.5 }}>{r.vibe}</p>
                 </div>
                 <div style={{ height:1, background:"rgba(255,255,255,0.04)", margin:"0 18px" }} />
-                <div style={{ padding:"14px 18px" }}>
-                  <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,122,0,0.8)", textTransform:"uppercase", letterSpacing:1.5, marginBottom:12 }}>📋 Must Order</p>
-                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                    {r.mustOrder.map((dish,j) => (
-                      <div key={j} style={{ display:"flex", alignItems:"center", gap:12, background:"rgba(255,255,255,0.03)", borderRadius:12, border:"1px solid rgba(255,255,255,0.05)", overflow:"hidden" }}>
-                        <div style={{ width:70, height:70, flexShrink:0, background:"#1A1A22", overflow:"hidden" }}>
-                          {dishImages[dish] ? <img src={dishImages[dish]} alt={dish} style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e => e.currentTarget.style.display="none"} />
-                            : <div style={{ width:"100%", height:"100%", background:"linear-gradient(90deg,#1A1A22 25%,#242430 50%,#1A1A22 75%)", backgroundSize:"200% 100%", animation:"shimmer 1.5s infinite" }} />}
-                        </div>
-                        <div style={{ flex:1, padding:"0 12px 0 0" }}>
-                          <p style={{ fontSize:13, fontWeight:600, color:"#fff", marginBottom:2 }}>{dish}</p>
-                          <p style={{ fontSize:11, color:"rgba(255,255,255,0.25)" }}>{r.name}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <DishMenu dishes={r.menu || r.mustOrder || []} restaurantName={r.name} dishImages={dishImages} cuisine={cuisine} />
                 {/* Order buttons */}
                 <div style={{ padding:"0 18px 18px", display:"flex", flexDirection:"column", gap:8 }}>
                   <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.25)", textTransform:"uppercase", letterSpacing:1.5 }}>Order Online</p>
                   <div style={{ display:"flex", gap:8 }}>
-                    <a href={`https://www.ubereats.com/search?q=${encodeURIComponent(r.mustOrder[0]+" "+cuisine)}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(6,181,93,0.1)", border:"1px solid rgba(6,181,93,0.3)", borderRadius:12, padding:"11px 6px", color:"#06B55D", fontSize:12, fontWeight:700 }}>🟢 Uber Eats</a>
+                    <a href={`https://www.ubereats.com/search?q=${encodeURIComponent((r.menu||r.mustOrder||[])[0]+" "+cuisine)}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(6,181,93,0.1)", border:"1px solid rgba(6,181,93,0.3)", borderRadius:12, padding:"11px 6px", color:"#06B55D", fontSize:12, fontWeight:700 }}>🟢 Uber Eats</a>
                     <a href={`https://www.doordash.com/search/store/${encodeURIComponent(cuisine+" "+r.name)}/`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(255,60,60,0.1)", border:"1px solid rgba(255,60,60,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF3C3C", fontSize:12, fontWeight:700 }}>🔴 DoorDash</a>
-                    <a href={`https://www.grubhub.com/search?queryText=${encodeURIComponent(cuisine+" "+r.mustOrder[0])}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(255,153,0,0.1)", border:"1px solid rgba(255,153,0,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF9900", fontSize:12, fontWeight:700 }}>🟡 GrubHub</a>
+                    <a href={`https://www.grubhub.com/search?queryText=${encodeURIComponent(cuisine+" "+(r.menu||r.mustOrder||[])[0])}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(255,153,0,0.1)", border:"1px solid rgba(255,153,0,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF9900", fontSize:12, fontWeight:700 }}>🟡 GrubHub</a>
                   </div>
                   <a href={`https://www.google.com/maps/search/${encodeURIComponent(r.searchTip)}`} target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:12, padding:"10px", color:"rgba(255,255,255,0.4)", fontSize:12, fontWeight:600 }}>📍 Find on Google Maps</a>
                 </div>
