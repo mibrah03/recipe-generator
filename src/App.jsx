@@ -163,6 +163,13 @@ function ShoppingList({ ingredients, onClose }) {
   const [checked, setChecked] = useState({});
   const toggle = (i) => setChecked(p => ({ ...p, [i]: !p[i] }));
   const copy = () => navigator.clipboard.writeText(ingredients.filter((_,i) => !checked[i]).map(i => "• " + i).join("\n"));
+  const share = async () => {
+    const text = "🛒 Shopping List\n\n" + ingredients.filter((_,i) => !checked[i]).map(i => "• " + i).join("\n");
+    try {
+      if (navigator.share) await navigator.share({ title: "Shopping List", text });
+      else { await navigator.clipboard.writeText(text); alert("Copied to clipboard!"); }
+    } catch(e) {}
+  };
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 1000, display: "flex", alignItems: "flex-end", backdropFilter: "blur(4px)" }} onClick={onClose}>
       <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", background: "#121218", borderRadius: "20px 20px 0 0", padding: "20px 20px 40px", maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column" }} onClick={e => e.stopPropagation()}>
@@ -170,6 +177,7 @@ function ShoppingList({ ingredients, onClose }) {
           <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>🛒 Shopping List</h3>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={copy} style={{ background: "rgba(255,122,0,0.1)", border: "1px solid rgba(255,122,0,0.3)", borderRadius: 20, padding: "6px 14px", color: "#FF7A00", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>📋 Copy</button>
+            <button onClick={share} style={{ background: "rgba(96,165,250,0.1)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: 20, padding: "6px 14px", color: "#60a5fa", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>📤 Share</button>
             <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 20, padding: "6px 14px", color: "#888", fontSize: 12, cursor: "pointer" }}>Close</button>
           </div>
         </div>
