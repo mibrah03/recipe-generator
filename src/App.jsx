@@ -634,16 +634,25 @@ export default function App() {
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginBottom: 16, lineHeight: 1.6 }}>{recipe.description}</p>
 
                 {/* Stats */}
-                <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
                   {[{ icon:"⏱", label:`${recipe.time} min` },{ icon:"📊", label:recipe.difficulty },{ icon:"👥", label:`${servings} servings` }].map((s,i) => <div key={i} style={{ background: "rgba(255,122,0,0.08)", border: "1px solid rgba(255,122,0,0.2)", borderRadius: 20, padding: "5px 12px", fontSize: 12, color: "#FFC857", fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>{s.icon} {s.label}</div>)}
+                </div>
+
+                {/* Serving adjuster */}
+                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", borderRadius: 12, padding: "12px 16px", marginBottom: 16 }}>
+                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", flex: 1 }}>Adjust servings</span>
+                  <button onClick={() => setServings(Math.max(1, servings - 1))} style={{ width: 28, height: 28, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 16, cursor: "pointer" }}>−</button>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: "#FF7A00", minWidth: 24, textAlign: "center" }}>{servings}</span>
+                  <button onClick={() => setServings(servings + 1)} style={{ width: 28, height: 28, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 16, cursor: "pointer" }}>+</button>
                 </div>
 
 
 
                 {/* Ingredients */}
                 <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 14, padding: "16px", marginBottom: 16 }}>
-                  <div style={{ marginBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,122,0,0.8)", textTransform: "uppercase", letterSpacing: 1.5 }}>Ingredients</p>
+                    <button onClick={() => setShowShopping(true)} style={{ background: "rgba(255,122,0,0.1)", border: "1px solid rgba(255,122,0,0.25)", borderRadius: 20, padding: "4px 10px", color: "#FF7A00", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>🛒 Shopping List</button>
                   </div>
                   {recipe.ingredients.map((ing, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: i < recipe.ingredients.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
@@ -689,11 +698,20 @@ export default function App() {
                   )}
                 </div>
 
+                {/* Feedback */}
+                <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", flex: 1, alignSelf: "center" }}>Was this good?</p>
+                  <button onClick={() => regenerateFromFeedback("up")} style={{ background: feedback === "up" ? "rgba(52,211,153,0.15)" : "rgba(255,255,255,0.05)", border: "1px solid " + (feedback === "up" ? "rgba(52,211,153,0.4)" : "rgba(255,255,255,0.1)"), borderRadius: 20, padding: "6px 14px", color: feedback === "up" ? "#34d399" : "#888", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>👍</button>
+                  <button onClick={() => regenerateFromFeedback("down")} style={{ background: feedback === "down" ? "rgba(255,80,80,0.1)" : "rgba(255,255,255,0.05)", border: "1px solid " + (feedback === "down" ? "rgba(255,80,80,0.3)" : "rgba(255,255,255,0.1)"), borderRadius: 20, padding: "6px 14px", color: feedback === "down" ? "#ff6b6b" : "#888", fontSize: 13, cursor: "pointer", fontWeight: 600 }}>👎 Try Another</button>
+                </div>
+
                 <button onClick={() => generateRecipe()} style={{ width: "100%", padding: "13px", borderRadius: 12, border: "1px solid rgba(255,122,0,0.25)", background: "transparent", color: "#FF7A00", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>🔄 Generate Another</button>
               </div>
             </div>
           )}
 
+
+          {showShopping && recipe && <ShoppingList ingredients={recipe.ingredients.map(i => scaleIngredient(i, recipe.servings))} onClose={() => setShowShopping(false)} />}
 
           {/* ── EAT OUT RESULTS ── */}
           {restaurants && (
@@ -737,21 +755,7 @@ export default function App() {
         </div>
       )}
 
-      {/* BOTTOM NAV */}
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(11,11,15,0.95)", backdropFilter: "blur(20px)", borderTop: "1px solid rgba(255,255,255,0.06)", padding: "10px 0 20px", zIndex: 500 }}>
-        <div style={{ display: "flex", maxWidth: 600, margin: "0 auto" }}>
-          {[
-            { id:"home", icon:"🏠", label:"Home" },
-            { id:"planner", icon:"📅", label:"Planner" },
-            { id:"preferences", icon:"⚙️", label:"Settings" },
-          ].map(nav => (
-            <button key={nav.id} onClick={() => setPage(nav.id)} style={{ flex: 1, background: "transparent", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "4px 0" }}>
-              <span style={{ fontSize: 20 }}>{nav.icon}</span>
-              <span style={{ fontSize: 10, color: page === nav.id ? "#FF7A00" : "rgba(255,255,255,0.25)", fontWeight: page === nav.id ? 700 : 400 }}>{nav.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+
     </div>
   );
 }
