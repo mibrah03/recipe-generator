@@ -34,7 +34,7 @@ const MEAL_TYPES = [
   { label: "🥚 Breakfast", value: "breakfast" },
   { label: "🍰 Dessert", value: "dessert" },
   { label: "🫓 Bread & Pastry", value: "bread or pastry" },
-  { label: "🎲 Surprise Me!", value: "any type of dish" },
+  { label: "🍽️ Surprise Me!", value: "any type of dish" },
 ];
 
 const TAG_COLORS = ["#ffd200","#f7971e","#a78bfa","#34d399","#60a5fa","#f472b6","#fb923c"];
@@ -199,7 +199,7 @@ Respond ONLY with a JSON object, no markdown, no backticks, no explanation. Use 
     }}>
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 28 }}>
-        <div style={{ fontSize: 48, marginBottom: 8 }}>🎲</div>
+        <div style={{ fontSize: 48, marginBottom: 8 }}>🍽️</div>
         <h1 style={{
           fontSize: 28, fontWeight: 800, margin: 0,
           background: "linear-gradient(90deg, #f7971e, #ffd200)",
@@ -220,7 +220,7 @@ Respond ONLY with a JSON object, no markdown, no backticks, no explanation. Use 
           border: "1px solid rgba(255,255,255,0.1)"
         }}>
           <button onClick={() => { setMode("random"); setRecipe(null); setRecipeImage(null); setError(""); }} style={tabStyle(mode === "random")}>
-            🎲 Random Recipe
+            🍽️ Random Recipe
           </button>
           <button onClick={() => { setMode("pantry"); setRecipe(null); setRecipeImage(null); setError(""); }} style={tabStyle(mode === "pantry")}>
             🧺 Use What I Have
@@ -324,7 +324,7 @@ Respond ONLY with a JSON object, no markdown, no backticks, no explanation. Use 
           letterSpacing: 0.5, transition: "all 0.2s",
           boxShadow: loading ? "none" : "0 4px 24px rgba(247,151,30,0.4)",
         }}>
-          {loading ? "✨ Finding the perfect recipe..." : mode === "pantry" ? "🧺 Cook With What I Have" : "🎲 Generate Recipe"}
+          {loading ? "✨ Finding the perfect recipe..." : mode === "pantry" ? "🧺 Cook With What I Have" : "🍽️ Generate Recipe"}
         </button>
 
         {/* Recipe Card */}
@@ -450,7 +450,7 @@ Respond ONLY with a JSON object, no markdown, no backticks, no explanation. Use 
                 border: "2px solid rgba(255,210,0,0.3)", background: "transparent",
                 color: "#ffd200", fontSize: 14, fontWeight: 700, cursor: "pointer",
               }}>
-                🎲 Try Another Recipe
+                🍽️ Try Another Recipe
               </button>
             </div>
           </div>
