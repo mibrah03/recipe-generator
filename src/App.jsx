@@ -744,8 +744,21 @@ export default function App() {
                       ))}
                     </div>
                   </div>
-                  <div style={{ padding: "0 18px 18px" }}>
-                    <a href={`https://www.google.com/maps/search/${encodeURIComponent(r.searchTip)}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "linear-gradient(135deg,rgba(255,122,0,0.15),rgba(255,200,87,0.1))", border: "1px solid rgba(255,122,0,0.3)", borderRadius: 12, padding: "11px", color: "#FF7A00", fontSize: 13, fontWeight: 700, width: "100%" }}>📍 Find on Google Maps</a>
+                  <div style={{ padding: "0 18px 18px", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {/* Order buttons */}
+                    <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 2 }}>Order Online</p>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <a href={`https://www.ubereats.com/search?q=${encodeURIComponent(r.mustOrder[0] + " " + cuisine)}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(6,181,93,0.1)", border: "1px solid rgba(6,181,93,0.3)", borderRadius: 12, padding: "11px 8px", color: "#06B55D", fontSize: 12, fontWeight: 700 }}>
+                        🟢 Uber Eats
+                      </a>
+                      <a href={`https://www.doordash.com/search/store/${encodeURIComponent(cuisine + " " + r.name)}/`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(255,60,60,0.1)", border: "1px solid rgba(255,60,60,0.3)", borderRadius: 12, padding: "11px 8px", color: "#FF3C3C", fontSize: 12, fontWeight: 700 }}>
+                        🔴 DoorDash
+                      </a>
+                      <a href={`https://www.grubhub.com/search?queryText=${encodeURIComponent(cuisine + " " + r.mustOrder[0])}`} target="_blank" rel="noopener noreferrer" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: "rgba(255,153,0,0.1)", border: "1px solid rgba(255,153,0,0.3)", borderRadius: 12, padding: "11px 8px", color: "#FF9900", fontSize: 12, fontWeight: 700 }}>
+                        🟡 GrubHub
+                      </a>
+                    </div>
+                    <a href={`https://www.google.com/maps/search/${encodeURIComponent(r.searchTip)}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, padding: "10px", color: "rgba(255,255,255,0.4)", fontSize: 12, fontWeight: 600, width: "100%" }}>📍 Find on Google Maps</a>
                   </div>
                 </div>
               ))}
