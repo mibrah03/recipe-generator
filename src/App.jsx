@@ -220,6 +220,7 @@ export default function App() {
   const [pantryItems, setPantryItems] = useState([]);
   const [recipe, setRecipe] = useState(null);
   const [restaurants, setRestaurants] = useState(null);
+  const [dishImages, setDishImages] = useState({});
   const [recipeImage, setRecipeImage] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -243,31 +244,75 @@ export default function App() {
   };
   const removeItem = (item) => setPantryItems(pantryItems.filter(i => i !== item));
 
+  const fetchFoodImage = async (query) => {
+    // Use Wikimedia Commons REST API - returns images that actually match the search
+    try {
+      const url = "https://en.wikipedia.org/w/api.php?action=query&titles=" +
+        encodeURIComponent(query) + "&prop=pageimages&pithumbsize=800&format=json&origin=*";
+      const res = await fetch(url);
+      const data = await res.json();
+      const pages = data.query?.pages;
+      if (pages) {
+        const page = Object.values(pages)[0];
+        if (page?.thumbnail?.source) return page.thumbnail.source;
+      }
+    } catch(e) {}
+    return null;
+  };
+
   const fetchImage = async (recipeName, cuisineName) => {
     setImageLoading(true); setRecipeImage(null);
     try {
-      const wikiRes = await fetch("https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=" + encodeURIComponent(recipeName + " food") + "&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url|mime&format=json&origin=*");
-      const pages = (await wikiRes.json()).query?.pages;
-      if (pages) {
-        for (const page of Object.values(pages)) {
+      // Try exact recipe Wikipedia page first
+      let img = await fetchFoodImage(recipeName);
+      if (img) { setRecipeImage(img); setImageLoading(false); return; }
+
+      // Try recipe name + cuisine
+      img = await fetchFoodImage(recipeName + " " + cuisineName + " dish");
+      if (img) { setRecipeImage(img); setImageLoading(false); return; }
+
+      // Try just the dish name
+      img = await fetchFoodImage(recipeName + " dish");
+      if (img) { setRecipeImage(img); setImageLoading(false); return; }
+
+      // Fallback: search in files namespace
+      const wikiRes = await fetch("https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=" +
+        encodeURIComponent(recipeName) + "&gsrnamespace=6&gsrlimit=15&prop=imageinfo&iiprop=url|mime&format=json&origin=*");
+      const pages2 = (await wikiRes.json()).query?.pages;
+      if (pages2) {
+        for (const page of Object.values(pages2)) {
           const info = page.imageinfo?.[0];
-          if (info?.mime?.startsWith("image/") && /\.(jpg|jpeg|png|webp)/i.test(info.url) && !info.url.includes("Flag") && !info.url.includes("Map") && !info.url.includes("Logo")) {
-            setRecipeImage(info.url); setImageLoading(false); return;
-          }
-        }
-      }
-      const fb = await fetch("https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=" + encodeURIComponent(cuisineName + " food dish") + "&gsrnamespace=6&gsrlimit=10&prop=imageinfo&iiprop=url|mime&format=json&origin=*");
-      const fbPages = (await fb.json()).query?.pages;
-      if (fbPages) {
-        for (const page of Object.values(fbPages)) {
-          const info = page.imageinfo?.[0];
-          if (info?.mime?.startsWith("image/") && /\.(jpg|jpeg|png|webp)/i.test(info.url) && !info.url.includes("Flag") && !info.url.includes("Map")) {
+          const title = (page.title || "").toLowerCase();
+          if (info?.mime?.startsWith("image/") && /\.(jpg|jpeg|png|webp)/i.test(info.url)
+            && !info.url.includes("Flag") && !info.url.includes("Map") && !info.url.includes("Logo")
+            && !info.url.includes("icon") && !title.includes("map") && !title.includes("flag")) {
             setRecipeImage(info.url); setImageLoading(false); return;
           }
         }
       }
     } catch (e) {}
     setImageLoading(false);
+  };
+
+  const fetchDishImage = async (dishName) => {
+    try {
+      const img = await fetchFoodImage(dishName);
+      if (img) return img;
+      // fallback search
+      const res = await fetch("https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=" +
+        encodeURIComponent(dishName + " food") + "&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|mime&format=json&origin=*");
+      const pages = (await res.json()).query?.pages;
+      if (pages) {
+        for (const page of Object.values(pages)) {
+          const info = page.imageinfo?.[0];
+          if (info?.mime?.startsWith("image/") && /\.(jpg|jpeg|png|webp)/i.test(info.url)
+            && !info.url.includes("Flag") && !info.url.includes("Map") && !info.url.includes("Logo")) {
+            return info.url;
+          }
+        }
+      }
+    } catch(e) {}
+    return null;
   };
 
   const getLocation = () => new Promise((res, rej) => { if (!navigator.geolocation) rej(); else navigator.geolocation.getCurrentPosition(res, rej); });
@@ -310,6 +355,18 @@ export default function App() {
       const data = await res.json();
       const parsed = JSON.parse(data.content.map(i => i.text || "").join("").replace(/```json|```/g, "").trim());
       setRestaurants(parsed.restaurants);
+      // Fetch images for each must-order dish in background
+      const imgs = {};
+      for (const restaurant of parsed.restaurants) {
+        for (const dish of restaurant.mustOrder) {
+          const key = dish;
+          if (!imgs[key]) {
+            const img = await fetchDishImage(dish);
+            if (img) imgs[key] = img;
+          }
+        }
+      }
+      setDishImages(imgs);
     } catch (err) { setError("Something went wrong. Try again!"); }
     setLoading(false);
   };
@@ -323,7 +380,7 @@ export default function App() {
     } catch (e) {}
   };
 
-  const reset = () => { setRecipe(null); setRestaurants(null); setRecipeImage(null); setError(""); };
+  const reset = () => { setRecipe(null); setRestaurants(null); setRecipeImage(null); setDishImages({}); setError(""); };
 
   return (
     <div style={{ minHeight: "100vh", background: "#0B0B0F", fontFamily: "'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif", color: "#fff", overflowX: "hidden" }}>
@@ -559,26 +616,66 @@ export default function App() {
         {/* Eat Out Results */}
         {restaurants && (
           <div style={{ animation: "fadeUp 0.5s ease" }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>🍴 {cuisine} Restaurants Near You</p>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 16 }}>🍴 {cuisine} Restaurants Near You</p>
             {restaurants.map((r, i) => (
-              <div key={i} style={{ background: "#121218", borderRadius: 18, border: "1px solid rgba(255,255,255,0.06)", padding: "18px", marginBottom: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.3)" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>{r.name}</h3>
-                  <span style={{ background: "rgba(255,200,87,0.1)", border: "1px solid rgba(255,200,87,0.25)", borderRadius: 20, padding: "3px 10px", fontSize: 11, color: "#FFC857", fontWeight: 700, marginLeft: 8, flexShrink: 0 }}>{r.priceRange}</span>
+              <div key={i} style={{ background: "#121218", borderRadius: 20, border: "1px solid rgba(255,255,255,0.06)", marginBottom: 16, boxShadow: "0 8px 40px rgba(0,0,0,0.4)", overflow: "hidden" }}>
+                {/* Restaurant Header */}
+                <div style={{ padding: "18px 18px 14px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 5 }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{r.name}</h3>
+                    <span style={{ background: "rgba(255,200,87,0.1)", border: "1px solid rgba(255,200,87,0.25)", borderRadius: 20, padding: "3px 10px", fontSize: 11, color: "#FFC857", fontWeight: 700, marginLeft: 8, flexShrink: 0 }}>{r.priceRange}</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", lineHeight: 1.5, marginBottom: 0 }}>{r.vibe}</p>
                 </div>
-                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", marginBottom: 12, lineHeight: 1.5 }}>{r.vibe}</p>
-                <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,122,0,0.7)", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 8 }}>Must Order</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 }}>
-                  {r.mustOrder.map((dish, j) => (
-                    <span key={j} style={{ background: "rgba(255,122,0,0.08)", border: "1px solid rgba(255,122,0,0.18)", borderRadius: 20, padding: "4px 11px", fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{dish}</span>
-                  ))}
+
+                {/* Divider */}
+                <div style={{ height: 1, background: "rgba(255,255,255,0.04)", margin: "0 18px" }} />
+
+                {/* Must Order Menu with Photos */}
+                <div style={{ padding: "14px 18px 16px" }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,122,0,0.8)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 12 }}>📋 Must Order</p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {r.mustOrder.map((dish, j) => (
+                      <div key={j} style={{
+                        display: "flex", alignItems: "center", gap: 12,
+                        background: "rgba(255,255,255,0.03)", borderRadius: 12,
+                        border: "1px solid rgba(255,255,255,0.05)", overflow: "hidden",
+                      }}>
+                        {/* Dish photo */}
+                        <div style={{ width: 70, height: 70, flexShrink: 0, background: "#1A1A22", position: "relative", overflow: "hidden" }}>
+                          {dishImages[dish] ? (
+                            <img src={dishImages[dish]} alt={dish}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              onError={e => { e.currentTarget.style.display = "none"; }}
+                            />
+                          ) : (
+                            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center",
+                              background: "linear-gradient(90deg, #1A1A22 25%, #242430 50%, #1A1A22 75%)",
+                              backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite",
+                              fontSize: 24 }}>
+                              {Object.keys(dishImages).length === 0 ? "🍽️" : ""}
+                            </div>
+                          )}
+                        </div>
+                        {/* Dish name */}
+                        <div style={{ flex: 1, padding: "0 12px 0 0" }}>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: "#fff", marginBottom: 2 }}>{dish}</p>
+                          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{r.name}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <a href={`https://www.google.com/maps/search/${encodeURIComponent(r.searchTip)}`} target="_blank" rel="noopener noreferrer" style={{
-                  display: "inline-flex", alignItems: "center", gap: 6,
-                  background: "linear-gradient(135deg, rgba(255,122,0,0.15), rgba(255,200,87,0.1))",
-                  border: "1px solid rgba(255,122,0,0.3)", borderRadius: 20,
-                  padding: "7px 16px", color: "#FF7A00", fontSize: 12, fontWeight: 700,
-                }}>📍 Find on Google Maps</a>
+
+                {/* Find Button */}
+                <div style={{ padding: "0 18px 18px" }}>
+                  <a href={`https://www.google.com/maps/search/${encodeURIComponent(r.searchTip)}`} target="_blank" rel="noopener noreferrer" style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                    background: "linear-gradient(135deg, rgba(255,122,0,0.15), rgba(255,200,87,0.1))",
+                    border: "1px solid rgba(255,122,0,0.3)", borderRadius: 12,
+                    padding: "11px", color: "#FF7A00", fontSize: 13, fontWeight: 700, width: "100%",
+                  }}>📍 Find on Google Maps</a>
+                </div>
               </div>
             ))}
             <button onClick={findRestaurants} style={{ width: "100%", padding: "13px", borderRadius: 12, border: "1px solid rgba(255,122,0,0.25)", background: "transparent", color: "#FF7A00", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
