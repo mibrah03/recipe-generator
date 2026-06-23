@@ -410,6 +410,10 @@ export default function App() {
   const [heroImg] = useState(() => HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)]);
   const todayCuisine = ALL_CUISINES[new Date().getDate() % ALL_CUISINES.length];
 
+  const addEatIng = (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); const val = eatIngInput.trim().replace(/,$/, ""); if (val && !eatIngredients.includes(val)) setEatIngredients([...eatIngredients, val]); setEatIngInput(""); } };
+  const addEatIngBlur = () => { const val = eatIngInput.trim().replace(/,$/, ""); if (val && !eatIngredients.includes(val)) setEatIngredients([...eatIngredients, val]); setEatIngInput(""); };
+  const removeEatIng = (item) => setEatIngredients(eatIngredients.filter(i => i !== item));
+
   const addPantryItem = (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); const val = pantryInput.trim().replace(/,$/, ""); if (val && !pantryItems.includes(val)) setPantryItems([...pantryItems, val]); setPantryInput(""); } };
   const addPantryItemOnBlur = () => { const val = pantryInput.trim().replace(/,$/, ""); if (val && !pantryItems.includes(val)) setPantryItems([...pantryItems, val]); setPantryInput(""); };
   const removeItem = (item) => setPantryItems(pantryItems.filter(i => i !== item));
@@ -484,6 +488,8 @@ export default function App() {
   };
 
   const [excludedRestaurants, setExcludedRestaurants] = useState([]);
+  const [eatIngredients, setEatIngredients] = useState([]);
+  const [eatIngInput, setEatIngInput] = useState("");
 
   const findRestaurants = async (findDifferent = false) => {
     if (!cuisine) { setError("Search for a cuisine first"); return; }
@@ -511,7 +517,9 @@ export default function App() {
       if (findDifferent) setExcludedRestaurants(currentExcluded);
 
       const styleText = mealStyle ? ` User prefers ${mealStyle}.` : "";
+      const eatIngText = eatIngredients.length > 0 ? ` The user specifically wants dishes that include or feature: ${eatIngredients.join(", ")}.` : "";
       const excludeText = currentExcluded.length > 0 ? ` Do NOT suggest these restaurants again: ${currentExcluded.join(", ")}.` : "";
+      const ingFilter = eatIngredients.length > 0 ? ` Focus on restaurants that serve dishes featuring: ${eatIngredients.join(", ")}.` : "";
 
       // Call our serverless function which calls Google Places API server-side
       let realPlaces = [];
@@ -534,7 +542,7 @@ export default function App() {
       if (realPlaces.length > 0) {
         // Enrich real places with menu suggestions from Claude
         const enrichText = await callClaude(
-          `These are real ${cuisine} restaurants near ${locationLabel}: ${realPlaces.map(p => p.name).join(", ")}.${styleText}
+          `These are real ${cuisine} restaurants near ${locationLabel}: ${realPlaces.map(p => p.name).join(", ")}.${styleText}${ingFilter}
 For each restaurant suggest 8 signature dishes likely on their menu.
 Respond ONLY with JSON: {"restaurants":[{"name":"Exact restaurant name","vibe":"One sentence atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5","Dish 6","Dish 7","Dish 8"]}]}`
         );
@@ -555,7 +563,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Exact restaurant name","vibe":"
       } else {
         // Fallback: Claude generates suggestions (no real data)
         const text = await callClaude(
-          `User wants ${cuisine} food near ${locationLabel}.${styleText}${excludeText}
+          `User wants ${cuisine} food near ${locationLabel}.${styleText}${ingFilter}${excludeText}
 Suggest 5 DIFFERENT ${cuisine} restaurant types with 8 signature dishes each. Make each one unique and distinct from others.
 Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":"Short atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5","Dish 6","Dish 7","Dish 8"],"priceRange":"$$","searchTip":"Google Maps search term"}]}`
         );
@@ -650,7 +658,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
           <div style={{ display:"flex", background:"rgba(255,255,255,0.04)", borderRadius:18, padding:4, border:"1px solid rgba(255,255,255,0.06)", position:"relative" }}>
             <div style={{ position:"absolute", top:4, bottom:4, left:tab==="cook"?4:"calc(50% + 2px)", width:"calc(50% - 6px)", background:"linear-gradient(135deg,#FF7A00,#FFC857)", borderRadius:14, transition:"left 0.35s cubic-bezier(0.4,0,0.2,1)", boxShadow:"0 4px 20px rgba(255,122,0,0.4)" }} />
             {[["cook","👨‍🍳 Cook"],["eat","🍴 Eat Out"]].map(([val,lbl]) => (
-              <button key={val} onClick={() => { setTab(val); reset(); }} style={{ flex:1, padding:"13px 0", border:"none", background:"transparent", color:tab===val?"#0B0B0F":"rgba(255,255,255,0.4)", fontSize:14, fontWeight:tab===val?800:500, cursor:"pointer", position:"relative", zIndex:1, borderRadius:14, transition:"color 0.3s" }}>{lbl}</button>
+              <button key={val} onClick={() => { setTab(val); reset(); setEatIngredients([]); setEatIngInput(""); }} style={{ flex:1, padding:"13px 0", border:"none", background:"transparent", color:tab===val?"#0B0B0F":"rgba(255,255,255,0.4)", fontSize:14, fontWeight:tab===val?800:500, cursor:"pointer", position:"relative", zIndex:1, borderRadius:14, transition:"color 0.3s" }}>{lbl}</button>
             ))}
           </div>
         </div>
@@ -685,6 +693,21 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
           <CuisineSearch cuisine={cuisine} setCuisine={(v) => { setCuisine(v); reset(); }} />
           <Dropdown icon="🥗" value={mealStyle} onChange={setMealStyle} options={MEAL_STYLES} placeholder="Any dietary style…" />
           {tab === "cook" && mode === "random" && <Dropdown icon="🍽️" value={mealType} onChange={setMealType} options={MEAL_TYPES} placeholder="What type of dish?…" />}
+          {tab === "eat" && (
+            <div style={{ padding:"13px 16px", borderRadius:14, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.04)" }}>
+              <div style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.25)", textTransform:"uppercase", letterSpacing:1.5, marginBottom:10 }}>🥗 Ingredients I'm craving</div>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:7, marginBottom:eatIngredients.length > 0 ? 10 : 0 }}>
+                {eatIngredients.map((item, i) => (
+                  <span key={item} style={{ background:`${TAG_COLORS[i%TAG_COLORS.length]}18`, border:`1px solid ${TAG_COLORS[i%TAG_COLORS.length]}40`, color:TAG_COLORS[i%TAG_COLORS.length], borderRadius:20, padding:"4px 12px", fontSize:12, fontWeight:600, display:"flex", alignItems:"center", gap:5 }}>
+                    {item}<span onClick={() => removeEatIng(item)} style={{ cursor:"pointer", opacity:0.6, fontSize:14 }}>×</span>
+                  </span>
+                ))}
+              </div>
+              <input value={eatIngInput} onChange={e => setEatIngInput(e.target.value)} onKeyDown={addEatIng} onBlur={addEatIngBlur}
+                placeholder={eatIngredients.length === 0 ? "e.g. chicken, garlic, pasta… press Enter" : "Add more…"}
+                style={{ width:"100%", background:"transparent", border:"none", outline:"none", color:"#fff", fontSize:13 }} />
+            </div>
+          )}
           <Dropdown icon="🌐" value={language} onChange={setLanguage} options={LANGUAGES} placeholder="Language…" />
           {tab === "cook" && mode === "pantry" && (
             <div style={{ padding:"14px 16px", borderRadius:14, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.04)" }}>
