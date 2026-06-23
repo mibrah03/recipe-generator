@@ -493,20 +493,109 @@ export default function App() {
     if (thumbs === "down" && recipe) generateRecipe(`Generate a DIFFERENT authentic ${cuisine} ${mealType || "dish"} recipe. NOT ${recipe.name}. Make it distinct.${mealStyle ? ` Must be ${mealStyle}.` : ""}`);
   };
 
-  const findRestaurants = async () => {
+  const [excludedRestaurants, setExcludedRestaurants] = useState([]);
+
+  const findRestaurants = async (findDifferent = false) => {
     if (!cuisine) { setError("Search for a cuisine first"); return; }
     setError(""); setLoading(true); setRestaurants(null); setDishImages({});
+
     try {
-      let locationText = "The user's location is unknown, suggest they search nearby.";
-      try { const pos = await getLocation(); locationText = `User is at lat ${pos.coords.latitude}, lng ${pos.coords.longitude}.`; } catch(e) {}
+      // Get real GPS location
+      let lat = null, lng = null, locationLabel = "your area";
+      try {
+        const pos = await getLocation();
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+        try {
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=en`);
+          const geoData = await geoRes.json();
+          locationLabel = geoData.address?.city || geoData.address?.town || geoData.address?.suburb || "your area";
+        } catch(e) {}
+      } catch(e) {
+        setError("📍 Please allow location access to find restaurants near you.");
+        setLoading(false);
+        return;
+      }
+
+      const currentExcluded = findDifferent ? [...(restaurants || []).map(r => r.name), ...excludedRestaurants] : [];
+      if (findDifferent) setExcludedRestaurants(currentExcluded);
+
       const styleText = mealStyle ? ` User prefers ${mealStyle}.` : "";
-      const text = await callClaude(`${locationText}${styleText} User wants ${cuisine} food. Suggest 3 real-world types of ${cuisine} restaurants with 4 signature must-order dishes each. Note: these are real restaurant types that exist. Respond ONLY with JSON: {"restaurants":[{"name":"Restaurant type","vibe":"Short atmosphere description","mustOrder":["Dish 1","Dish 2","Dish 3","Dish 4"],"priceRange":"$$","searchTip":"Exact Google Maps search term","disclaimer":"These are suggested restaurant types, not confirmed locations"}]}`);
-      const parsed = JSON.parse(text);
-      setRestaurants(parsed.restaurants);
+      const excludeText = currentExcluded.length > 0 ? ` Do NOT suggest these restaurants again: ${currentExcluded.join(", ")}.` : "";
+
+      // Try Google Places API for real nearby restaurants
+      let realPlaces = [];
+      const placesKey = import.meta.env.VITE_GOOGLE_PLACES_KEY;
+      if (placesKey) {
+        try {
+          const placesRes = await fetch(
+            `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=restaurant&keyword=${encodeURIComponent(cuisine + " restaurant")}&key=${placesKey}`
+          );
+          if (placesRes.ok) {
+            const placesData = await placesRes.json();
+            realPlaces = (placesData.results || [])
+              .filter(p => !currentExcluded.includes(p.name))
+              .slice(0, 5)
+              .map(p => ({
+                name: p.name,
+                rating: p.rating,
+                address: p.vicinity,
+                placeId: p.place_id,
+                priceLevel: p.price_level,
+                isOpen: p.opening_hours?.open_now,
+              }));
+          }
+        } catch(e) {}
+      }
+
+      let restaurantData = [];
+
+      if (realPlaces.length > 0) {
+        // Enrich real places with menu suggestions from Claude
+        const enrichText = await callClaude(
+          `These are real ${cuisine} restaurants near ${locationLabel}: ${realPlaces.map(p => p.name).join(", ")}.${styleText}
+For each restaurant suggest 8 signature dishes likely on their menu.
+Respond ONLY with JSON: {"restaurants":[{"name":"Exact restaurant name","vibe":"One sentence atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5","Dish 6","Dish 7","Dish 8"]}]}`
+        );
+        const enriched = JSON.parse(enrichText);
+        restaurantData = enriched.restaurants.map((r, idx) => {
+          const real = realPlaces[idx] || realPlaces.find(p => p.name.toLowerCase().includes(r.name.split(" ")[0].toLowerCase()));
+          return {
+            ...r,
+            name: real?.name || r.name,
+            address: real?.address || "",
+            rating: real?.rating || null,
+            priceRange: real?.priceLevel ? "$".repeat(real.priceLevel) : "$$",
+            isOpen: real?.isOpen,
+            placeId: real?.placeId,
+            isReal: true,
+          };
+        });
+      } else {
+        // Fallback: Claude generates suggestions (no real data)
+        const text = await callClaude(
+          `User wants ${cuisine} food near ${locationLabel}.${styleText}${excludeText}
+Suggest 5 DIFFERENT ${cuisine} restaurant types with 8 signature dishes each. Make each one unique and distinct from others.
+Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":"Short atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5","Dish 6","Dish 7","Dish 8"],"priceRange":"$$","searchTip":"Google Maps search term"}]}`
+        );
+        const parsed = JSON.parse(text);
+        restaurantData = parsed.restaurants.map(r => ({ ...r, isReal: false }));
+      }
+
+      setRestaurants(restaurantData);
+
+      // Fetch dish images
       const imgs = {};
-      for (const r of parsed.restaurants) { const dishes = r.menu || r.mustOrder || []; for (const dish of dishes) { if (!imgs[dish]) { const img = await fetchDishImage(dish); if (img) imgs[dish] = img; } } }
+      for (const r of restaurantData) {
+        for (const dish of (r.menu || []).slice(0, 8)) {
+          if (!imgs[dish]) { const img = await fetchDishImage(dish); if (img) imgs[dish] = img; }
+        }
+      }
       setDishImages(imgs);
-    } catch(err) { setError("Something went wrong. Try again!"); }
+    } catch(err) {
+      console.error(err);
+      setError("Something went wrong. Try again!");
+    }
     setLoading(false);
   };
 
@@ -650,9 +739,9 @@ export default function App() {
         )}
 
         {/* CTA */}
-        <button onClick={tab==="cook" ? () => generateRecipe() : findRestaurants} disabled={loading} onMouseEnter={() => setBtnHover(true)} onMouseLeave={() => setBtnHover(false)} style={{ width:"100%", padding:"17px", borderRadius:16, border:"none", background:loading?"#1A1A22":"linear-gradient(135deg,#FF7A00 0%,#FFC857 100%)", color:loading?"#444":"#0B0B0F", fontSize:15, fontWeight:800, cursor:loading?"not-allowed":"pointer", boxShadow:loading?"none":btnHover?"0 8px 40px rgba(255,122,0,0.6)":"0 4px 24px rgba(255,122,0,0.35)", transition:"all 0.25s", transform:btnHover&&!loading?"translateY(-1px)":"none", marginBottom:28 }}>
+        <button onClick={tab==="cook" ? () => generateRecipe() : () => findRestaurants(false)} disabled={loading} onMouseEnter={() => setBtnHover(true)} onMouseLeave={() => setBtnHover(false)} style={{ width:"100%", padding:"17px", borderRadius:16, border:"none", background:loading?"#1A1A22":"linear-gradient(135deg,#FF7A00 0%,#FFC857 100%)", color:loading?"#444":"#0B0B0F", fontSize:15, fontWeight:800, cursor:loading?"not-allowed":"pointer", boxShadow:loading?"none":btnHover?"0 8px 40px rgba(255,122,0,0.6)":"0 4px 24px rgba(255,122,0,0.35)", transition:"all 0.25s", transform:btnHover&&!loading?"translateY(-1px)":"none", marginBottom:28 }}>
           {loading ? <span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}><span style={{ width:16, height:16, borderRadius:"50%", border:"2px solid #333", borderTopColor:"#666", animation:"spin 0.8s linear infinite", display:"inline-block" }} />Finding the perfect option…</span>
-            : tab==="eat" ? "🍴 Find Restaurants Near Me" : mode==="pantry" ? "🧺 Cook With What I Have" : "✨ Generate My Recipe"}
+            : tab==="eat" ? "📍 Find Restaurants Near Me" : mode==="pantry" ? "🧺 Cook With What I Have" : "✨ Generate My Recipe"}
         </button>
 
         {/* ── RECIPE CARD ── */}
@@ -753,18 +842,31 @@ export default function App() {
         {restaurants && (
           <div style={{ animation:"fadeUp 0.5s ease" }}>
             <div style={{ background:"rgba(255,200,87,0.06)", border:"1px solid rgba(255,200,87,0.15)", borderRadius:10, padding:"10px 14px", marginBottom:14, fontSize:12, color:"rgba(255,200,87,0.7)" }}>
-              ⚠️ These are suggested restaurant types, not confirmed real locations. Use Google Maps or delivery apps to find actual places near you.
+              📍 Real restaurants show your actual location. "Suggested" types are AI recommendations — tap their name to search on Google.
             </div>
             <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.25)", textTransform:"uppercase", letterSpacing:1.5, marginBottom:14 }}>🍴 {cuisine} Restaurants Near You</p>
             {restaurants.map((r,i) => (
               <div key={i} style={{ background:"#121218", borderRadius:20, border:"1px solid rgba(255,255,255,0.06)", marginBottom:16, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
                 <div style={{ padding:"18px 18px 14px" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:4 }}>
-                    <a href={`https://www.google.com/search?q=${encodeURIComponent(r.name + " " + cuisine + " restaurant")}`} target="_blank" rel="noopener noreferrer" style={{ fontSize:16, fontWeight:800, color:"#fff", textDecoration:"none", display:"flex", alignItems:"center", gap:6, flex:1 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:6 }}>
+                    <a href={r.placeId ? `https://www.google.com/maps/place/?q=place_id:${r.placeId}` : `https://www.google.com/search?q=${encodeURIComponent(r.name + " " + cuisine + " restaurant")}`} target="_blank" rel="noopener noreferrer" style={{ fontSize:16, fontWeight:800, color:"#fff", textDecoration:"none", flex:1 }}>
                       {r.name}
-                      <span style={{ fontSize:11, color:"rgba(255,122,0,0.6)", fontWeight:600 }}>🔍 Search</span>
+                      <span style={{ fontSize:11, color:"rgba(255,122,0,0.7)", fontWeight:600, marginLeft:6 }}>↗</span>
                     </a>
-                    <span style={{ background:"rgba(255,200,87,0.1)", border:"1px solid rgba(255,200,87,0.25)", borderRadius:20, padding:"3px 10px", fontSize:11, color:"#FFC857", fontWeight:700, marginLeft:8, flexShrink:0 }}>{r.priceRange}</span>
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4, marginLeft:8 }}>
+                      <span style={{ background:"rgba(255,200,87,0.1)", border:"1px solid rgba(255,200,87,0.25)", borderRadius:20, padding:"2px 9px", fontSize:11, color:"#FFC857", fontWeight:700 }}>{r.priceRange}</span>
+                      {r.isReal ? (
+                        <span style={{ background:"rgba(52,211,153,0.1)", border:"1px solid rgba(52,211,153,0.25)", borderRadius:20, padding:"2px 9px", fontSize:9, color:"#34d399", fontWeight:700, textTransform:"uppercase", letterSpacing:0.5 }}>📍 Real Place</span>
+                      ) : (
+                        <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"2px 9px", fontSize:9, color:"rgba(255,255,255,0.3)", fontWeight:700, textTransform:"uppercase", letterSpacing:0.5 }}>Suggested</span>
+                      )}
+                    </div>
+                  </div>
+                  {r.address && <p style={{ fontSize:11, color:"rgba(255,122,0,0.6)", marginBottom:4, fontWeight:500 }}>📍 {r.address}</p>}
+                  <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
+                    {r.rating && <span style={{ fontSize:12, color:"#FFC857", fontWeight:600 }}>⭐ {r.rating}</span>}
+                    {r.isOpen === true && <span style={{ fontSize:11, color:"#34d399", fontWeight:600 }}>● Open Now</span>}
+                    {r.isOpen === false && <span style={{ fontSize:11, color:"#ef4444", fontWeight:600 }}>● Closed</span>}
                   </div>
                   <p style={{ fontSize:12, color:"rgba(255,255,255,0.3)", lineHeight:1.5 }}>{r.vibe}</p>
                 </div>
@@ -782,7 +884,7 @@ export default function App() {
                 </div>
               </div>
             ))}
-            <button onClick={findRestaurants} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid rgba(255,122,0,0.25)", background:"transparent", color:"#FF7A00", fontSize:13, fontWeight:700, cursor:"pointer" }}>🔄 Find Different Restaurants</button>
+            <button onClick={() => findRestaurants(true)} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid rgba(255,122,0,0.25)", background:"transparent", color:"#FF7A00", fontSize:13, fontWeight:700, cursor:"pointer" }}>🔄 Find Different Restaurants</button>
           </div>
         )}
       </div>
