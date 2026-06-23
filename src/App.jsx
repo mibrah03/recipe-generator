@@ -523,30 +523,34 @@ export default function App() {
       const styleText = mealStyle ? ` User prefers ${mealStyle}.` : "";
       const excludeText = currentExcluded.length > 0 ? ` Do NOT suggest these restaurants again: ${currentExcluded.join(", ")}.` : "";
 
-      // Try Google Places API for real nearby restaurants
+      // Call our serverless function which calls Google Places API server-side
       let realPlaces = [];
-      const placesKey = import.meta.env.VITE_GOOGLE_PLACES_KEY;
-      if (placesKey) {
-        try {
-          const placesRes = await fetch(
-            `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=5000&type=restaurant&keyword=${encodeURIComponent(cuisine + " restaurant")}&key=${placesKey}`
-          );
-          if (placesRes.ok) {
-            const placesData = await placesRes.json();
-            realPlaces = (placesData.results || [])
-              .filter(p => !currentExcluded.includes(p.name))
-              .slice(0, 5)
-              .map(p => ({
-                name: p.name,
-                rating: p.rating,
-                address: p.vicinity,
-                placeId: p.place_id,
-                priceLevel: p.price_level,
-                isOpen: p.opening_hours?.open_now,
-              }));
-          }
-        } catch(e) {}
-      }
+      try {
+        const placesRes = await fetch("/api/places", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lat, lng, cuisine }),
+        });
+        if (placesRes.ok) {
+          const placesData = await placesRes.json();
+          realPlaces = (placesData.places || [])
+            .filter(p => !currentExcluded.includes(p.displayName?.text))
+            .slice(0, 5)
+            .map(p => ({
+              name: p.displayName?.text || "",
+              rating: p.rating,
+              address: p.formattedAddress,
+              placeId: p.id,
+              priceLevel: p.priceLevel,
+              isOpen: p.currentOpeningHours?.openNow,
+              mapsUri: p.googleMapsUri,
+              website: p.websiteUri,
+            }));
+        } else {
+          const err = await placesRes.json();
+          console.error("Places API error:", err);
+        }
+      } catch(e) { console.error("Places fetch error:", e); }
 
       let restaurantData = [];
 
@@ -565,7 +569,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Exact restaurant name","vibe":"
             name: real?.name || r.name,
             address: real?.address || "",
             rating: real?.rating || null,
-            priceRange: real?.priceLevel ? "$".repeat(real.priceLevel) : "$$",
+            priceRange: (() => { const pl = real?.priceLevel; if (!pl) return "$$"; const map = {"PRICE_LEVEL_FREE":"Free","PRICE_LEVEL_INEXPENSIVE":"$","PRICE_LEVEL_MODERATE":"$$","PRICE_LEVEL_EXPENSIVE":"$$$","PRICE_LEVEL_VERY_EXPENSIVE":"$$$$"}; return map[pl] || "$$"; })(),
             isOpen: real?.isOpen,
             placeId: real?.placeId,
             isReal: true,
@@ -849,7 +853,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
               <div key={i} style={{ background:"#121218", borderRadius:20, border:"1px solid rgba(255,255,255,0.06)", marginBottom:16, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
                 <div style={{ padding:"18px 18px 14px" }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:6 }}>
-                    <a href={r.placeId ? `https://www.google.com/maps/place/?q=place_id:${r.placeId}` : `https://www.google.com/search?q=${encodeURIComponent(r.name + " " + cuisine + " restaurant")}`} target="_blank" rel="noopener noreferrer" style={{ fontSize:16, fontWeight:800, color:"#fff", textDecoration:"none", flex:1 }}>
+                    <a href={r.mapsUri || (r.placeId ? `https://www.google.com/maps/place/?q=place_id:${r.placeId}` : `https://www.google.com/search?q=${encodeURIComponent(r.name + " " + cuisine + " restaurant")}`)} target="_blank" rel="noopener noreferrer" style={{ fontSize:16, fontWeight:800, color:"#fff", textDecoration:"none", flex:1 }}>
                       {r.name}
                       <span style={{ fontSize:11, color:"rgba(255,122,0,0.7)", fontWeight:600, marginLeft:6 }}>↗</span>
                     </a>
