@@ -410,6 +410,7 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false);
   const [btnHover, setBtnHover] = useState(false);
   const [heroImg] = useState(() => HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)]);
+  const [shuffledChips] = useState(() => [...QUICK_CHIPS].sort(() => Math.random() - 0.5));
   const todayCuisine = ALL_CUISINES[new Date().getDate() % ALL_CUISINES.length];
 
   const addEatIng = (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); const val = eatIngInput.trim().replace(/,$/, ""); if (val && !eatIngredients.includes(val)) setEatIngredients([...eatIngredients, val]); setEatIngInput(""); } };
@@ -669,7 +670,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
         <div style={{ marginBottom:18 }}>
           <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.25)", textTransform:"uppercase", letterSpacing:1.5, marginBottom:8 }}>Quick Pick</p>
           <div style={{ display:"flex", gap:7, overflowX:"auto", paddingBottom:2 }}>
-            {QUICK_CHIPS.map(c => {
+            {shuffledChips.map(c => {
               const active = cuisine === c.value;
               return <button key={c.value} onClick={() => { setCuisine(c.value); reset(); }} style={{ flexShrink:0, padding:"7px 13px", borderRadius:20, border:"1px solid "+(active?"rgba(255,122,0,0.8)":"rgba(255,255,255,0.07)"), background:active?"rgba(255,122,0,0.15)":"rgba(255,255,255,0.03)", color:active?"#FF7A00":"rgba(255,255,255,0.5)", fontSize:12, fontWeight:active?700:400, cursor:"pointer", boxShadow:active?"0 0 16px rgba(255,122,0,0.2)":"none", transition:"all 0.2s", whiteSpace:"nowrap" }}>{c.label}</button>;
             })}
