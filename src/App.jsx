@@ -336,7 +336,8 @@ function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
 function DishMenu({ dishes, restaurantName, dishImages, cuisine }) {
   const [expanded, setExpanded] = useState(false);
   const [selectedDish, setSelectedDish] = useState(null);
-  const visible = expanded ? dishes : dishes.slice(0, 4);
+  const INITIAL_SHOW = 4;
+  const visible = expanded ? dishes : dishes.slice(0, INITIAL_SHOW);
 
   return (
     <div style={{ padding:"14px 18px" }}>
@@ -759,7 +760,10 @@ export default function App() {
               <div key={i} style={{ background:"#121218", borderRadius:20, border:"1px solid rgba(255,255,255,0.06)", marginBottom:16, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
                 <div style={{ padding:"18px 18px 14px" }}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:4 }}>
-                    <h3 style={{ fontSize:16, fontWeight:800, color:"#fff" }}>{r.name}</h3>
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(r.name + " " + cuisine + " restaurant")}`} target="_blank" rel="noopener noreferrer" style={{ fontSize:16, fontWeight:800, color:"#fff", textDecoration:"none", display:"flex", alignItems:"center", gap:6, flex:1 }}>
+                      {r.name}
+                      <span style={{ fontSize:11, color:"rgba(255,122,0,0.6)", fontWeight:600 }}>🔍 Search</span>
+                    </a>
                     <span style={{ background:"rgba(255,200,87,0.1)", border:"1px solid rgba(255,200,87,0.25)", borderRadius:20, padding:"3px 10px", fontSize:11, color:"#FFC857", fontWeight:700, marginLeft:8, flexShrink:0 }}>{r.priceRange}</span>
                   </div>
                   <p style={{ fontSize:12, color:"rgba(255,255,255,0.3)", lineHeight:1.5 }}>{r.vibe}</p>
