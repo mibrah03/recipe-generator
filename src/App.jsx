@@ -417,17 +417,7 @@ export default function App() {
   // ── IMAGE: Pexels (accurate food photos) ─────────────────────────────────
   const fetchImage = async (recipeName) => {
     setImageLoading(true); setRecipeImage(null);
-    try {
-      // Try Pexels first — much more accurate food photos
-      const pexelsRes = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(recipeName + " food dish")}&per_page=1&orientation=landscape`, {
-        headers: { Authorization: "YOUR_PEXELS_KEY" }
-      });
-      if (pexelsRes.ok) {
-        const pexelsData = await pexelsRes.json();
-        if (pexelsData.photos?.[0]) { setRecipeImage(pexelsData.photos[0].src.large); setImageLoading(false); return; }
-      }
-    } catch(e) {}
-    // Fallback: Wikipedia thumbnail API
+    // Wikipedia thumbnail API
     try {
       const res = await fetch("https://en.wikipedia.org/w/api.php?action=query&titles=" + encodeURIComponent(recipeName) + "&prop=pageimages&pithumbsize=800&format=json&origin=*");
       const pages = (await res.json()).query?.pages;
@@ -531,24 +521,11 @@ export default function App() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lat, lng, cuisine }),
         });
-        if (placesRes.ok) {
-          const placesData = await placesRes.json();
-          realPlaces = (placesData.places || [])
-            .filter(p => !currentExcluded.includes(p.displayName?.text))
-            .slice(0, 5)
-            .map(p => ({
-              name: p.displayName?.text || "",
-              rating: p.rating,
-              address: p.formattedAddress,
-              placeId: p.id,
-              priceLevel: p.priceLevel,
-              isOpen: p.currentOpeningHours?.openNow,
-              mapsUri: p.googleMapsUri,
-              website: p.websiteUri,
-            }));
+        const placesData = await placesRes.json();
+        if (placesRes.ok && placesData.places) {
+          realPlaces = placesData.places.filter(p => !currentExcluded.includes(p.name));
         } else {
-          const err = await placesRes.json();
-          console.error("Places API error:", err);
+          console.error("Places API error:", placesData);
         }
       } catch(e) { console.error("Places fetch error:", e); }
 
