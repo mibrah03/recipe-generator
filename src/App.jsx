@@ -32,6 +32,8 @@ const QUICK_CHIPS = [
   { label: "🍜 Thai", value: "Thai" },{ label: "🥘 Korean", value: "Korean" },
   { label: "🦞 Singaporean", value: "Singaporean" },{ label: "🥗 Lebanese", value: "Lebanese" },
   { label: "🍲 Malaysian", value: "Malaysian" },
+  { label: "🇸🇩 Sudanese", value: "Sudanese" },
+  { label: "🇮🇶 Iraqi", value: "Iraqi" },
 ];
 
 const MEAL_STYLES = [
