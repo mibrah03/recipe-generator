@@ -174,7 +174,7 @@ function ShoppingList({ ingredients, onClose }) {
   };
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", zIndex: 1000, display: "flex", alignItems: "flex-end", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", background: "#121218", borderRadius: "20px 20px 0 0", padding: "20px 20px 40px", maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column" }} onClick={e => e.stopPropagation()}>
+      <div style={{ width: "100%", maxWidth: 600, margin: "0 auto", background: "#121218", borderRadius: "20px 20px 0 0", padding: "20px 20px calc(40px + env(safe-area-inset-bottom, 0px))", maxHeight: "85vh", overflow: "hidden", display: "flex", flexDirection: "column" }} onClick={e => e.stopPropagation()}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <h3 style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>🛒 Shopping List</h3>
           <div style={{ display: "flex", gap: 8 }}>
@@ -625,10 +625,15 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
     @keyframes fadeUp { from { opacity:0;transform:translateY(20px); } to { opacity:1;transform:translateY(0); } }
     @keyframes shimmer { from { background-position:-200% 0; } to { background-position:200% 0; } }
     @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
-    * { box-sizing:border-box;margin:0;padding:0; }
+    * { box-sizing:border-box;margin:0;padding:0; -webkit-tap-highlight-color:transparent; }
     ::-webkit-scrollbar{width:0;height:0;}
     input::placeholder{color:#444;}
+    input, textarea, select { font-size:16px !important; }
     a{text-decoration:none;}
+    button { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+    html { -webkit-text-size-adjust:100%; }
+    body { overscroll-behavior-y:contain; }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
   `;
 
   return (
@@ -639,7 +644,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
       {showShopping && recipe && <ShoppingList ingredients={recipe.ingredients.map(i => scaleIng(i))} onClose={() => setShowShopping(false)} />}
 
       {/* HERO */}
-      <div style={{ position:"relative", height:380, overflow:"hidden" }}>
+      <div style={{ position:"relative", height:"min(380px, 55vw)", minHeight:280, overflow:"hidden" }}>
         <img src={heroImg} alt="Food" style={{ width:"100%", height:"100%", objectFit:"cover", filter:"brightness(0.3)" }} />
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,rgba(11,11,15,0.1) 0%,rgba(11,11,15,0.65) 60%,#0B0B0F 100%)" }} />
         <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", justifyContent:"flex-end", padding:"0 20px 28px" }}>
@@ -648,13 +653,13 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
               <span style={{ width:6, height:6, borderRadius:"50%", background:"#FF7A00", animation:"pulse 2s infinite", display:"inline-block" }} />
               <span style={{ fontSize:11, fontWeight:600, color:"#FF7A00", letterSpacing:1, textTransform:"uppercase" }}>Today's Pick · {todayCuisine.label}</span>
             </div>
-            <h1 style={{ fontSize:30, fontWeight:900, lineHeight:1.15, marginBottom:8, letterSpacing:"-0.5px" }}>What Should I<br /><span style={{ background:"linear-gradient(90deg,#FF7A00,#FFC857)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Cook Tonight?</span></h1>
+            <h1 style={{ fontSize:"clamp(22px, 6vw, 30px)", fontWeight:900, lineHeight:1.15, marginBottom:8, letterSpacing:"-0.5px" }}>What Should I<br /><span style={{ background:"linear-gradient(90deg,#FF7A00,#FFC857)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Cook Tonight?</span></h1>
             <p style={{ fontSize:13, color:"rgba(255,255,255,0.45)", lineHeight:1.5 }}>AI-powered recipes tailored to your cravings.</p>
           </div>
         </div>
       </div>
 
-      <div style={{ padding:"0 16px 80px", maxWidth:600, margin:"0 auto" }}>
+      <div style={{ padding:"0 16px calc(80px + env(safe-area-inset-bottom, 0px))", maxWidth:600, margin:"0 auto" }}>
 
         {/* Cook / Eat Out */}
         <div style={{ marginTop:-16, marginBottom:20, animation:"fadeUp 0.5s ease 0.1s both" }}>
@@ -669,7 +674,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
         {/* Quick Chips */}
         <div style={{ marginBottom:18 }}>
           <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.25)", textTransform:"uppercase", letterSpacing:1.5, marginBottom:8 }}>Quick Pick</p>
-          <div style={{ display:"flex", gap:7, overflowX:"auto", paddingBottom:2 }}>
+          <div style={{ display:"flex", gap:7, overflowX:"auto", paddingBottom:6, WebkitOverflowScrolling:"touch", scrollbarWidth:"none", msOverflowStyle:"none" }}>
             {shuffledChips.map(c => {
               const active = cuisine === c.value;
               return <button key={c.value} onClick={() => { setCuisine(c.value); reset(); }} style={{ flexShrink:0, padding:"7px 13px", borderRadius:20, border:"1px solid "+(active?"rgba(255,122,0,0.8)":"rgba(255,255,255,0.07)"), background:active?"rgba(255,122,0,0.15)":"rgba(255,255,255,0.03)", color:active?"#FF7A00":"rgba(255,255,255,0.5)", fontSize:12, fontWeight:active?700:400, cursor:"pointer", boxShadow:active?"0 0 16px rgba(255,122,0,0.2)":"none", transition:"all 0.2s", whiteSpace:"nowrap" }}>{c.label}</button>;
@@ -679,7 +684,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
 
         {/* Cook sub modes */}
         {tab === "cook" && (
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:18 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(2, minmax(0, 1fr))", gap:10, marginBottom:18 }}>
             {[{val:"random",icon:"🎲",title:"Surprise Me",desc:"Get a random recipe"},{val:"pantry",icon:"🧺",title:"My Ingredients",desc:"Cook what you have"}].map(item => (
               <button key={item.val} onClick={() => { setMode(item.val); reset(); }} style={{ padding:"16px", borderRadius:16, border:"1px solid "+(mode===item.val?"rgba(255,122,0,0.5)":"rgba(255,255,255,0.06)"), background:mode===item.val?"rgba(255,122,0,0.1)":"rgba(255,255,255,0.02)", cursor:"pointer", textAlign:"left", transition:"all 0.2s", boxShadow:mode===item.val?"0 0 24px rgba(255,122,0,0.15)":"none" }}>
                 <div style={{ fontSize:22, marginBottom:6 }}>{item.icon}</div>
@@ -777,7 +782,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
 
               {/* Nutrition */}
               {nutrition && (
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, marginBottom:16 }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,minmax(0,1fr))", gap:6, marginBottom:16 }}>
                   {[{label:"Calories",val:Math.round(nutrition.calories*(servings/(recipe.servings||4))),unit:""},{label:"Protein",val:Math.round(nutrition.protein*(servings/(recipe.servings||4))),unit:"g"},{label:"Carbs",val:Math.round(nutrition.carbs*(servings/(recipe.servings||4))),unit:"g"},{label:"Fat",val:Math.round(nutrition.fat*(servings/(recipe.servings||4))),unit:"g"}].map((n,i) => (
                     <div key={i} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.06)", borderRadius:12, padding:"10px 8px", textAlign:"center" }}>
                       <p style={{ fontSize:16, fontWeight:800, color:"#fff" }}>{n.val}{n.unit}</p>
@@ -882,7 +887,7 @@ Respond ONLY with JSON: {"restaurants":[{"name":"Unique restaurant name","vibe":
                 {/* Order buttons */}
                 <div style={{ padding:"0 18px 18px", display:"flex", flexDirection:"column", gap:8 }}>
                   <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.25)", textTransform:"uppercase", letterSpacing:1.5 }}>Order Online</p>
-                  <div style={{ display:"flex", gap:8 }}>
+                  <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                     <a href={`https://www.ubereats.com/search?q=${encodeURIComponent((r.menu||r.mustOrder||[])[0]+" "+cuisine)}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(6,181,93,0.1)", border:"1px solid rgba(6,181,93,0.3)", borderRadius:12, padding:"11px 6px", color:"#06B55D", fontSize:12, fontWeight:700 }}>🟢 Uber Eats</a>
                     <a href={`https://www.doordash.com/search/store/${encodeURIComponent(cuisine+" "+r.name)}/`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(255,60,60,0.1)", border:"1px solid rgba(255,60,60,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF3C3C", fontSize:12, fontWeight:700 }}>🔴 DoorDash</a>
                     <a href={`https://www.grubhub.com/search?queryText=${encodeURIComponent(cuisine+" "+(r.menu||r.mustOrder||[])[0])}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:5, background:"rgba(255,153,0,0.1)", border:"1px solid rgba(255,153,0,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF9900", fontSize:12, fontWeight:700 }}>🟡 GrubHub</a>
