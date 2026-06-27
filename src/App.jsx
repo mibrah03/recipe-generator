@@ -669,6 +669,7 @@ export default function App() {
   const [excludedRestaurants, setExcludedRestaurants] = useState([]);
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
+  const [showSignInPrompt, setShowSignInPrompt] = useState(false);
   const [btnHover, setBtnHover] = useState(false);
   const [heroImg] = useState(()=>HERO_IMAGES[Math.floor(Math.random()*HERO_IMAGES.length)]);
   const [shuffledChips] = useState(()=>[...QUICK_CHIPS].sort(()=>Math.random()-0.5));
@@ -924,8 +925,6 @@ export default function App() {
           <Dropdown icon="🥗" value={mealStyle} onChange={setMealStyle} options={MEAL_STYLES} placeholder="Any dietary style…"/>
           {tab==="cook"&&mode==="random"&&<>
             <Dropdown icon="🍽️" value={mealType} onChange={setMealType} options={MEAL_TYPES} placeholder="What type of dish?…"/>
-            <Dropdown icon="⏱️" value={timeFilter} onChange={v=>setTimeFilter(Number(v))} options={TIME_FILTERS} placeholder="Select cooking time…"/>
-            <Dropdown icon="📊" value={difficultyFilter} onChange={setDifficultyFilter} options={DIFFICULTY_FILTERS} placeholder="Select difficulty…"/>
           </>}
           <Dropdown icon="🌐" value={language} onChange={setLanguage} options={LANGUAGES} placeholder="Language…"/>
           {tab==="cook"&&mode==="pantry"&&<div style={{ padding:"13px 16px", borderRadius:14, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.04)" }}>
@@ -997,8 +996,7 @@ export default function App() {
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,transparent 40%,#121218 100%)" }}/>
             <div style={{ position:"absolute", top:14, right:14, display:"flex", gap:8 }}>
               <button onClick={()=>setShowShareImage(true)} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:20, padding:"0 12px", height:36, color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer", minWidth:44 }}>🖼️</button>
-  <button onClick={toggleFav} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:"50%", width:36, height:36, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, cursor:"pointer" }}>{isFav?"❤️":"🤍"}</button>
-              <button onClick={shareRecipe} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:20, padding:"0 12px", height:36, color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer" }}>{shareMsg||"📤"}</button>
+  <button onClick={shareRecipe} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:20, padding:"0 12px", height:36, color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer" }}>{shareMsg||"📤 Share"}</button>
               <button onClick={printRecipe} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:20, padding:"0 12px", height:36, color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer" }}>🖨️</button>
             </div>
           </div>
@@ -1101,6 +1099,17 @@ export default function App() {
               </div>
               {userRating && <p style={{ fontSize:12, color:"#FFC857", textAlign:"center", marginTop:8, fontWeight:600 }}>{["","Needs work 😕","Could be better 😐","Pretty good 👍","Really good! 😊","Amazing! 🤩"][userRating]}</p>}
             </div>
+
+            {/* Save Recipe Button */}
+            {user ? (
+              <button onClick={toggleFav} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid "+(isFav?"rgba(255,122,0,0.5)":"rgba(255,255,255,0.08)"), background:isFav?"rgba(255,122,0,0.1)":"rgba(255,255,255,0.03)", color:isFav?"#FF7A00":"rgba(255,255,255,0.5)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, transition:"all 0.2s", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                {isFav ? "❤️ Recipe Saved!" : "🤍 Save Recipe"}
+              </button>
+            ) : (
+              <button onClick={()=>setShowSignInPrompt(true)} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"rgba(255,255,255,0.5)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                🤍 Save Recipe
+              </button>
+            )}
 
             {/* Made This Button */}
             <button onClick={()=>setMadeThis(!madThis)} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid "+(madThis?"rgba(52,211,153,0.5)":"rgba(255,255,255,0.08)"), background:madThis?"rgba(52,211,153,0.1)":"rgba(255,255,255,0.03)", color:madThis?"#34d399":"rgba(255,255,255,0.4)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, transition:"all 0.2s" }}>
