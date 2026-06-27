@@ -24,6 +24,18 @@ const ALL_CUISINES = [
   { label: "🇦🇺 Australian", value: "Australian" },{ label: "🇹🇼 Taiwanese", value: "Taiwanese" },
   { label: "🇪🇬 Egyptian", value: "Egyptian" },{ label: "🇮🇱 Israeli", value: "Israeli" },
   { label: "🇸🇩 Sudanese", value: "Sudanese" },{ label: "🇮🇶 Iraqi", value: "Iraqi" },
+  // Caribbean
+  { label: "🇯🇲 Jamaican", value: "Jamaican" },{ label: "🇨🇺 Cuban", value: "Cuban" },
+  { label: "🇹🇹 Trinidadian", value: "Trinidadian" },{ label: "🇭🇹 Haitian", value: "Haitian" },
+  { label: "🇧🇧 Barbadian", value: "Barbadian" },
+  // Central Asian
+  { label: "🇺🇿 Uzbek", value: "Uzbek" },{ label: "🇰🇿 Kazakh", value: "Kazakh" },
+  { label: "🇦🇿 Azerbaijani", value: "Azerbaijani" },{ label: "🇬🇪 Georgian", value: "Georgian" },
+  { label: "🇦🇲 Armenian", value: "Armenian" },
+  // Eastern European
+  { label: "🇷🇴 Romanian", value: "Romanian" },{ label: "🇧🇬 Bulgarian", value: "Bulgarian" },
+  { label: "🇷🇸 Serbian", value: "Serbian" },{ label: "🇭🇺 Hungarian", value: "Hungarian" },
+  { label: "🇨🇿 Czech", value: "Czech" },{ label: "🇸🇰 Slovak", value: "Slovak" },
 ];
 
 const QUICK_CHIPS = [
@@ -52,6 +64,13 @@ const MEAL_TYPES = [
   { label: "🔥 Grilled", value: "grilled dish" },{ label: "🥩 Meat", value: "meat dish" },
   { label: "🐟 Seafood", value: "seafood dish" },{ label: "🥚 Breakfast", value: "breakfast" },
   { label: "🍰 Dessert", value: "dessert" },{ label: "🫓 Bread & Pastry", value: "bread or pastry" },
+];
+
+const DIFFICULTY_FILTERS = [
+  { label: "🍽️ Any Difficulty", value: "" },
+  { label: "🟢 Easy", value: "easy" },
+  { label: "🟡 Medium", value: "medium" },
+  { label: "🔴 Hard", value: "hard" },
 ];
 
 const TIME_FILTERS = [
@@ -618,6 +637,8 @@ export default function App() {
   const [mealStyle, setMealStyle] = useState(()=>load("pref_style",""));
   const [mealType, setMealType] = useState("");
   const [timeFilter, setTimeFilter] = useState(0);
+  const [difficultyFilter, setDifficultyFilter] = useState("");
+  const [darkMode, setDarkMode] = useState(() => load("darkMode", true));
   const [language, setLanguage] = useState("English");
   const [pantryInput, setPantryInput] = useState("");
   const [pantryItems, setPantryItems] = useState([]);
@@ -642,11 +663,26 @@ export default function App() {
   const [subIngredient, setSubIngredient] = useState(null);
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [favourites, setFavourites] = useState(() => load("favourites", []));
+  const [showFavourites, setShowFavourites] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+  const [madThis, setMadeThis] = useState(false);
   const [excludedRestaurants, setExcludedRestaurants] = useState([]);
   const [btnHover, setBtnHover] = useState(false);
   const [heroImg] = useState(()=>HERO_IMAGES[Math.floor(Math.random()*HERO_IMAGES.length)]);
   const [shuffledChips] = useState(()=>[...QUICK_CHIPS].sort(()=>Math.random()-0.5));
   const todayCuisine = ALL_CUISINES[new Date().getDate()%ALL_CUISINES.length];
+
+  const toggleDarkMode = () => { const next = !darkMode; setDarkMode(next); save("darkMode", next); };
+  const toggleFav = () => {
+    if (!recipe) return;
+    const exists = favourites.some(f => f.name === recipe.name);
+    let next;
+    if (exists) { next = favourites.filter(f => f.name !== recipe.name); }
+    else { next = [{ ...recipe, image: recipeImage, savedAt: Date.now(), cuisine }, ...favourites].slice(0, 50); }
+    setFavourites(next); save("favourites", next);
+  };
+  const isFav = recipe ? favourites.some(f => f.name === recipe.name) : false;
 
   const addPantryItem=(e)=>{if(e.key==="Enter"||e.key===","){e.preventDefault();const val=pantryInput.trim().replace(/,$/,"");if(val&&!pantryItems.includes(val))setPantryItems([...pantryItems,val]);setPantryInput("");}};
   const addPantryItemOnBlur=()=>{const val=pantryInput.trim().replace(/,$/,"");if(val&&!pantryItems.includes(val))setPantryItems([...pantryItems,val]);setPantryInput("");};
@@ -681,12 +717,13 @@ export default function App() {
     setError("");setLoading(true);setRecipe(null);setRecipeImage(null);setNutrition(null);setFeedback(null);
     const styleText=mealStyle?` The recipe must be ${mealStyle}.`:"";
     const timeText=timeFilter>0&&timeFilter<999?` The recipe must be ready in under ${timeFilter} minutes.`:timeFilter===999?" The recipe can take over 1 hour, a slow cook or elaborate dish is fine.":"";
+    const diffText=difficultyFilter?` The recipe difficulty must be ${difficultyFilter}.`:"";
     const langText=language!=="English"?` Translate the entire recipe into ${language}.`:"";
-    const prompt=overridePrompt||(mode==="random"?`Generate a random authentic ${cuisine} ${mealType} recipe.${styleText}${timeText}${langText}`:`Generate an authentic ${cuisine} recipe using ONLY or mostly these ingredients: ${pantryItems.join(", ")}. Assume basic staples available.${styleText}${timeText}${langText}`);
+    const prompt=overridePrompt||(mode==="random"?`Generate a random authentic ${cuisine} ${mealType} recipe.${styleText}${timeText}${diffText}${langText}`:`Generate an authentic ${cuisine} recipe using ONLY or mostly these ingredients: ${pantryItems.join(", ")}. Assume basic staples available.${styleText}${timeText}${diffText}${langText}`);
     try {
       const text=await callClaude(`${prompt} Respond ONLY with JSON: {"name":"Recipe Name","description":"One sentence","time":30,"difficulty":"Easy","servings":4,"ingredients":["item with qty"],"steps":["Step 1"],"stepTimes":[0,300,0],"tip":"Chef tip","calories":450,"protein":28,"carbs":35,"fat":18}`);
       const parsed=JSON.parse(text);
-      setRecipe(parsed);setServings(parsed.servings||4);
+      setRecipe(parsed);setServings(parsed.servings||4);setMadeThis(false);setUserRating(null);
       if(parsed.calories)setNutrition({calories:parsed.calories,protein:parsed.protein,carbs:parsed.carbs,fat:parsed.fat});
       fetchImage(parsed.name);
       const newHistory=[{...parsed,cuisine,timestamp:Date.now()},...history].slice(0,10);
@@ -701,7 +738,7 @@ export default function App() {
     try {
       const text=await callClaude(`Generate a full authentic recipe for "${r.name}" (${r.cuisine} cuisine). Respond ONLY with JSON: {"name":"Recipe Name","description":"One sentence","time":${r.time},"difficulty":"${r.difficulty}","servings":4,"ingredients":["item with qty"],"steps":["Step 1"],"stepTimes":[0,300,0],"tip":"Chef tip","calories":450,"protein":28,"carbs":35,"fat":18}`);
       const parsed=JSON.parse(text);
-      setRecipe(parsed);setServings(parsed.servings||4);
+      setRecipe(parsed);setServings(parsed.servings||4);setMadeThis(false);setUserRating(null);
       if(parsed.calories)setNutrition({calories:parsed.calories,protein:parsed.protein,carbs:parsed.carbs,fat:parsed.fat});
       fetchImage(parsed.name);
     } catch(e){setError("Something went wrong.");}
@@ -777,7 +814,7 @@ export default function App() {
   `;
 
   return (
-    <div style={{ minHeight:"100vh", background:"#0B0B0F", fontFamily:"'Inter','SF Pro Display',-apple-system,system-ui,sans-serif", color:"#fff", overflowX:"hidden" }}>
+    <div style={{ minHeight:"100vh", background:darkMode?"#0B0B0F":"#F8F8F2", fontFamily:"'Inter','SF Pro Display',-apple-system,system-ui,sans-serif", color:darkMode?"#fff":"#1a1a2e", overflowX:"hidden", transition:"background 0.3s, color 0.3s" }}>
       <style>{css}</style>
       {showCooking&&recipe&&<CookingMode recipe={recipe} onClose={()=>setShowCooking(false)}/>}
       {showShopping&&recipe&&<ShoppingList ingredients={recipe.ingredients.map(i=>scaleIng(i))} onClose={()=>setShowShopping(false)}/>}
@@ -801,7 +838,10 @@ export default function App() {
                 <h1 style={{ fontSize:"clamp(22px,6vw,30px)", fontWeight:900, lineHeight:1.15, marginBottom:8, letterSpacing:"-0.5px" }}>What Should I<br/><span style={{ background:"linear-gradient(90deg,#FF7A00,#FFC857)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Cook Tonight?</span></h1>
               </div>
               {/* Search button */}
-              <button onClick={()=>setShowSearch(true)} style={{ background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:14, padding:"10px 14px", color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", gap:6, flexShrink:0, marginBottom:8, minHeight:44 }}>🔍 Search</button>
+<div style={{ display:"flex", gap:8, flexShrink:0, marginBottom:8 }}>
+                <button onClick={toggleDarkMode} style={{ background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:14, padding:"10px 12px", color:"#fff", fontSize:16, cursor:"pointer", minHeight:44, minWidth:44 }}>{darkMode?"☀️":"🌙"}</button>
+                <button onClick={()=>setShowSearch(true)} style={{ background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:14, padding:"10px 14px", color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", display:"flex", alignItems:"center", gap:6, minHeight:44 }}>🔍 Search</button>
+              </div>
             </div>
           </div>
         </div>
@@ -842,6 +882,7 @@ export default function App() {
           {tab==="cook"&&mode==="random"&&<>
             <Dropdown icon="🍽️" value={mealType} onChange={setMealType} options={MEAL_TYPES} placeholder="What type of dish?…"/>
             <Dropdown icon="⏱️" value={timeFilter} onChange={v=>setTimeFilter(Number(v))} options={TIME_FILTERS} placeholder="Any cooking time…"/>
+            <Dropdown icon="📊" value={difficultyFilter} onChange={setDifficultyFilter} options={DIFFICULTY_FILTERS} placeholder="Any difficulty…"/>
           </>}
           <Dropdown icon="🌐" value={language} onChange={setLanguage} options={LANGUAGES} placeholder="Language…"/>
           {tab==="cook"&&mode==="pantry"&&<div style={{ padding:"13px 16px", borderRadius:14, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.04)" }}>
@@ -863,13 +904,40 @@ export default function App() {
         {error&&<div style={{ background:"rgba(255,80,80,0.08)", border:"1px solid rgba(255,80,80,0.25)", borderRadius:10, padding:"10px 14px", marginBottom:14, fontSize:13, color:"#ff6b6b" }}>⚠️ {error}</div>}
 
         {/* History */}
-        {history.length>0&&!recipe&&<button onClick={()=>setShowHistory(!showHistory)} style={{ width:"100%", padding:"11px", borderRadius:12, border:"1px solid rgba(255,255,255,0.07)", background:"rgba(255,255,255,0.03)", color:"rgba(255,255,255,0.35)", fontSize:12, cursor:"pointer", marginBottom:12, minHeight:44 }}>🕐 Recent Recipes ({history.length})</button>}
+        <div style={{ display:"flex", gap:8, marginBottom:12 }}>
+          {history.length>0&&!recipe&&<button onClick={()=>setShowHistory(!showHistory)} style={{ flex:1, padding:"11px", borderRadius:12, border:"1px solid rgba(255,255,255,0.07)", background:"rgba(255,255,255,0.03)", color:"rgba(255,255,255,0.35)", fontSize:12, cursor:"pointer", minHeight:44 }}>🕐 Recent ({history.length})</button>}
+          {favourites.length>0&&!recipe&&<button onClick={()=>setShowFavourites(!showFavourites)} style={{ flex:1, padding:"11px", borderRadius:12, border:"1px solid rgba(255,122,0,0.2)", background:"rgba(255,122,0,0.05)", color:"rgba(255,122,0,0.7)", fontSize:12, cursor:"pointer", minHeight:44 }}>❤️ Saved ({favourites.length})</button>}
+        </div>
         {showHistory&&<div style={{ background:"#121218", borderRadius:14, border:"1px solid rgba(255,255,255,0.06)", overflow:"hidden", marginBottom:14 }}>
           {history.map((h,i)=><div key={i} onClick={()=>{setRecipe(h);setServings(h.servings||4);setShowHistory(false);if(h.calories)setNutrition({calories:h.calories,protein:h.protein,carbs:h.carbs,fat:h.fat});}} style={{ padding:"12px 16px", borderBottom:i<history.length-1?"1px solid rgba(255,255,255,0.04)":"none", cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", minHeight:56 }}>
             <div><p style={{ fontSize:13, fontWeight:600, color:"#fff", marginBottom:2 }}>{h.name}</p><p style={{ fontSize:11, color:"rgba(255,255,255,0.3)" }}>{h.cuisine} · {h.time} min</p></div>
             <span style={{ color:"rgba(255,255,255,0.2)", fontSize:18 }}>→</span>
           </div>)}
         </div>}
+
+        {/* Favourites Panel */}
+        {showFavourites && (
+          <div style={{ background:"#121218", borderRadius:16, border:"1px solid rgba(255,255,255,0.08)", overflow:"hidden", marginBottom:16, animation:"fadeUp 0.3s ease" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"14px 16px", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+              <p style={{ fontSize:14, fontWeight:700, color:"#fff" }}>❤️ Saved Recipes ({favourites.length})</p>
+              <button onClick={()=>setShowFavourites(false)} style={{ background:"transparent", border:"none", color:"#888", fontSize:16, cursor:"pointer" }}>✕</button>
+            </div>
+            {favourites.length === 0 ? (
+              <p style={{ padding:"20px 16px", color:"rgba(255,255,255,0.3)", fontSize:13, textAlign:"center" }}>No saved recipes yet. Tap ❤️ on a recipe to save it!</p>
+            ) : favourites.map((fav, i) => (
+              <div key={i} onClick={() => { setRecipe(fav); setRecipeImage(fav.image||null); setServings(fav.servings||4); setShowFavourites(false); setMadeThis(false); setUserRating(null); }} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", borderBottom:i<favourites.length-1?"1px solid rgba(255,255,255,0.04)":"none", cursor:"pointer" }}>
+                <div style={{ width:52, height:52, borderRadius:10, overflow:"hidden", background:"#1A1A22", flexShrink:0 }}>
+                  {fav.image ? <img src={fav.image} alt={fav.name} style={{ width:"100%", height:"100%", objectFit:"cover" }}/> : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>🍽️</div>}
+                </div>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:13, fontWeight:600, color:"#fff", marginBottom:2 }}>{fav.name}</p>
+                  <p style={{ fontSize:11, color:"rgba(255,255,255,0.3)" }}>{fav.cuisine} · ⏱ {fav.time} min</p>
+                </div>
+                <button onClick={e => { e.stopPropagation(); const next = favourites.filter((_,j)=>j!==i); setFavourites(next); save("favourites",next); }} style={{ background:"transparent", border:"none", color:"rgba(255,255,255,0.2)", fontSize:18, cursor:"pointer", padding:"0 4px" }}>×</button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* CTA */}
         <button onClick={tab==="cook"?()=>generateRecipe():()=>findRestaurants(false)} disabled={loading} onMouseEnter={()=>setBtnHover(true)} onMouseLeave={()=>setBtnHover(false)} style={{ width:"100%", padding:"17px", borderRadius:16, border:"none", background:loading?"#1A1A22":"linear-gradient(135deg,#FF7A00 0%,#FFC857 100%)", color:loading?"#444":"#0B0B0F", fontSize:15, fontWeight:800, cursor:loading?"not-allowed":"pointer", boxShadow:loading?"none":btnHover?"0 8px 40px rgba(255,122,0,0.6)":"0 4px 24px rgba(255,122,0,0.35)", transition:"all 0.25s", transform:btnHover&&!loading?"translateY(-1px)":"none", marginBottom:24, minHeight:56 }}>
@@ -886,6 +954,7 @@ export default function App() {
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,transparent 40%,#121218 100%)" }}/>
             <div style={{ position:"absolute", top:14, right:14, display:"flex", gap:8 }}>
               <button onClick={()=>setShowShareImage(true)} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:20, padding:"0 12px", height:36, color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer", minWidth:44 }}>🖼️</button>
+  <button onClick={toggleFav} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:"50%", width:36, height:36, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, cursor:"pointer" }}>{isFav?"❤️":"🤍"}</button>
               <button onClick={shareRecipe} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:20, padding:"0 12px", height:36, color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer" }}>{shareMsg||"📤"}</button>
               <button onClick={printRecipe} style={{ background:"rgba(0,0,0,0.6)", backdropFilter:"blur(10px)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:20, padding:"0 12px", height:36, color:"#fff", fontSize:12, fontWeight:600, cursor:"pointer" }}>🖨️</button>
             </div>
@@ -944,6 +1013,20 @@ export default function App() {
               <button onClick={()=>regenerate("up")} style={{ background:feedback==="up"?"rgba(52,211,153,0.15)":"rgba(255,255,255,0.05)", border:"1px solid "+(feedback==="up"?"rgba(52,211,153,0.4)":"rgba(255,255,255,0.1)"), borderRadius:20, padding:"6px 16px", color:feedback==="up"?"#34d399":"#888", fontSize:13, cursor:"pointer", fontWeight:600, minHeight:36 }}>👍</button>
               <button onClick={()=>regenerate("down")} style={{ background:feedback==="down"?"rgba(255,80,80,0.1)":"rgba(255,255,255,0.05)", border:"1px solid "+(feedback==="down"?"rgba(255,80,80,0.3)":"rgba(255,255,255,0.1)"), borderRadius:20, padding:"6px 16px", color:feedback==="down"?"#ff6b6b":"#888", fontSize:13, cursor:"pointer", fontWeight:600, minHeight:36 }}>👎 Try Another</button>
             </div>
+            {/* Star Rating */}
+            <div style={{ background:"rgba(255,255,255,0.03)", borderRadius:12, padding:"14px 16px", marginBottom:14 }}>
+              <p style={{ fontSize:11, color:"rgba(255,255,255,0.4)", marginBottom:10, textAlign:"center" }}>Rate this recipe</p>
+              <div style={{ display:"flex", justifyContent:"center", gap:8 }}>
+                {[1,2,3,4,5].map(star => <button key={star} onClick={()=>setUserRating(star)} style={{ background:"transparent", border:"none", fontSize:28, cursor:"pointer", opacity:userRating&&star<=userRating?1:0.3, transition:"all 0.15s", transform:userRating&&star<=userRating?"scale(1.2)":"scale(1)" }}>⭐</button>)}
+              </div>
+              {userRating && <p style={{ fontSize:12, color:"#FFC857", textAlign:"center", marginTop:8, fontWeight:600 }}>{["","Needs work 😕","Could be better 😐","Pretty good 👍","Really good! 😊","Amazing! 🤩"][userRating]}</p>}
+            </div>
+
+            {/* Made This Button */}
+            <button onClick={()=>setMadeThis(!madThis)} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid "+(madThis?"rgba(52,211,153,0.5)":"rgba(255,255,255,0.08)"), background:madThis?"rgba(52,211,153,0.1)":"rgba(255,255,255,0.03)", color:madThis?"#34d399":"rgba(255,255,255,0.4)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, transition:"all 0.2s" }}>
+              {madThis?"✅ Made This! Great choice 🍳":"👨‍🍳 I Made This!"}
+            </button>
+
             <button onClick={()=>generateRecipe()} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid rgba(255,122,0,0.25)", background:"transparent", color:"#FF7A00", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48 }}>🔄 Generate Another</button>
           </div>
         </div>}
