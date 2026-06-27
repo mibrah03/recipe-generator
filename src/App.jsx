@@ -1111,7 +1111,7 @@ export default function App() {
             </div>
 
             {/* Save Recipe Button */}
-            <button onClick={toggleFav} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid "+(isFav?"rgba(255,122,0,0.5)":"rgba(255,255,255,0.08)"), background:isFav?"rgba(255,122,0,0.1)":"rgba(255,255,255,0.03)", color:isFav?"#FF7A00":"rgba(255,255,255,0.5)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, transition:"all 0.2s", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+            <button onClick={(e)=>{ e.preventDefault(); e.stopPropagation(); toggleFav(); }} style={{ width:"100%", padding:"16px", borderRadius:12, border:"2px solid "+(isFav?"#FF7A00":"rgba(255,255,255,0.15)"), background:isFav?"rgba(255,122,0,0.15)":"rgba(255,255,255,0.05)", color:isFav?"#FF7A00":"rgba(255,255,255,0.7)", fontSize:14, fontWeight:700, cursor:"pointer", minHeight:52, marginBottom:10, transition:"all 0.2s", display:"flex", alignItems:"center", justifyContent:"center", gap:8, position:"relative", zIndex:10, pointerEvents:"all" }}>
               {isFav ? "❤️ Recipe Saved!" : "🤍 Save Recipe"}
             </button>
 
