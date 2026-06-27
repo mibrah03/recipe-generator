@@ -232,7 +232,7 @@ function ShoppingList({ ingredients, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
@@ -270,7 +270,7 @@ function CookingMode({ recipe, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
@@ -384,7 +384,7 @@ function ShareImageModal({ recipe, image, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
@@ -447,7 +447,7 @@ function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
@@ -532,7 +532,7 @@ function RecipeSearchModal({ onClose, onSelect }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
@@ -581,7 +581,7 @@ function SubstitutionModal({ ingredient, cuisine, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
@@ -622,7 +622,7 @@ function MapView({ restaurants, cuisine, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
@@ -1007,6 +1007,43 @@ export default function App() {
               </div>)}
             </div>
             {recipe.tip&&<div style={{ background:"linear-gradient(135deg,rgba(255,122,0,0.08),rgba(255,200,87,0.06))", border:"1px solid rgba(255,122,0,0.2)", borderRadius:12, padding:"12px 14px", marginBottom:16 }}><span style={{ fontWeight:700, color:"#FF7A00", fontSize:12 }}>👨‍🍳 Chef's Tip  </span><span style={{ fontSize:12, color:"rgba(255,255,255,0.55)", lineHeight:1.6 }}>{recipe.tip}</span></div>}
+
+            {/* Grocery Delivery Integration */}
+            <div style={{ background:"rgba(255,255,255,0.03)", borderRadius:14, padding:"16px", marginBottom:16, border:"1px solid rgba(255,255,255,0.06)" }}>
+              <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.3)", textTransform:"uppercase", letterSpacing:1.5, marginBottom:12 }}>🛒 Order All Ingredients</p>
+              <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+                <a href={`https://www.instacart.com/store/s?k=${encodeURIComponent(recipe.name + " ingredients")}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, minWidth:120, display:"flex", alignItems:"center", justifyContent:"center", gap:6, background:"rgba(0,168,0,0.1)", border:"1px solid rgba(0,168,0,0.3)", borderRadius:12, padding:"11px 8px", color:"#00a800", fontSize:12, fontWeight:700, minHeight:44 }}>🟢 Instacart</a>
+                <a href={`https://www.amazon.com/s?k=${encodeURIComponent(recipe.name + " ingredients fresh")}&i=amazonfresh&tag=foodcontinent-20`} target="_blank" rel="noopener noreferrer" style={{ flex:1, minWidth:120, display:"flex", alignItems:"center", justifyContent:"center", gap:6, background:"rgba(255,153,0,0.1)", border:"1px solid rgba(255,153,0,0.3)", borderRadius:12, padding:"11px 8px", color:"#FF9900", fontSize:12, fontWeight:700, minHeight:44 }}>📦 Amazon Fresh</a>
+                <a href={`https://www.walmart.com/search?q=${encodeURIComponent(recipe.name + " ingredients")}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, minWidth:120, display:"flex", alignItems:"center", justifyContent:"center", gap:6, background:"rgba(0,76,145,0.1)", border:"1px solid rgba(0,76,145,0.3)", borderRadius:12, padding:"11px 8px", color:"#0076BE", fontSize:12, fontWeight:700, minHeight:44 }}>🔵 Walmart</a>
+              </div>
+            </div>
+
+            {/* HelloFresh Meal Kit */}
+            <a href="https://www.hellofresh.com/?c=foodcontinent&utm_source=foodcontinent&utm_medium=referral" target="_blank" rel="noopener noreferrer sponsored" style={{ display:"flex", alignItems:"center", gap:12, background:"linear-gradient(135deg,rgba(60,184,120,0.1),rgba(60,184,120,0.05))", border:"1px solid rgba(60,184,120,0.3)", borderRadius:14, padding:"14px 16px", marginBottom:16, textDecoration:"none" }}>
+              <div style={{ fontSize:32, flexShrink:0 }}>🥗</div>
+              <div style={{ flex:1 }}>
+                <p style={{ fontSize:13, fontWeight:700, color:"#3CB878", marginBottom:3 }}>Get ingredients delivered as a meal kit</p>
+                <p style={{ fontSize:11, color:"rgba(255,255,255,0.4)", lineHeight:1.5 }}>HelloFresh delivers pre-measured ingredients straight to your door. First box from $5.99/meal.</p>
+              </div>
+              <div style={{ background:"#3CB878", borderRadius:20, padding:"6px 12px", flexShrink:0 }}>
+                <p style={{ fontSize:11, fontWeight:800, color:"#fff", whiteSpace:"nowrap" }}>Try Now →</p>
+              </div>
+            </a>
+
+            {/* Sponsored Recipe Banner */}
+            <div style={{ background:"rgba(255,122,0,0.05)", border:"1px solid rgba(255,122,0,0.15)", borderRadius:14, padding:"14px 16px", marginBottom:16 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+                <span style={{ fontSize:10, fontWeight:700, color:"rgba(255,122,0,0.5)", textTransform:"uppercase", letterSpacing:1, background:"rgba(255,122,0,0.1)", borderRadius:20, padding:"2px 8px" }}>Sponsored</span>
+              </div>
+              <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+                <div style={{ fontSize:28 }}>🫒</div>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontSize:13, fontWeight:600, color:"#fff", marginBottom:2 }}>Elevate your cooking with premium olive oil</p>
+                  <p style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>Used by professional chefs worldwide</p>
+                </div>
+                <a href={`https://www.amazon.com/s?k=premium+olive+oil+cooking&tag=foodcontinent-20`} target="_blank" rel="noopener noreferrer" style={{ background:"rgba(255,122,0,0.15)", border:"1px solid rgba(255,122,0,0.3)", borderRadius:20, padding:"6px 12px", color:"#FF7A00", fontSize:11, fontWeight:700, textDecoration:"none", flexShrink:0, whiteSpace:"nowrap" }}>Shop →</a>
+              </div>
+            </div>
             <a href={`https://www.youtube.com/results?search_query=how+to+make+${encodeURIComponent(recipe.name)}`} target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"rgba(255,0,0,0.08)", border:"1px solid rgba(255,0,0,0.2)", borderRadius:12, padding:"12px", color:"#ff4444", fontSize:13, fontWeight:700, marginBottom:14, minHeight:48 }}>▶️ Watch on YouTube</a>
             <div style={{ display:"flex", gap:8, marginBottom:14 }}>
               <p style={{ fontSize:12, color:"rgba(255,255,255,0.3)", flex:1, alignSelf:"center" }}>Was this good?</p>
@@ -1085,7 +1122,7 @@ export default function App() {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
       </div>
       </div>
     </div>
