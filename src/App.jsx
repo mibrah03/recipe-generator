@@ -68,14 +68,12 @@ const MEAL_TYPES = [
 ];
 
 const DIFFICULTY_FILTERS = [
-  { label: "🍽️ Any Difficulty", value: "" },
   { label: "🟢 Easy", value: "easy" },
   { label: "🟡 Medium", value: "medium" },
   { label: "🔴 Hard", value: "hard" },
 ];
 
 const TIME_FILTERS = [
-  { label: "⚡ Any Time", value: 0 },
   { label: "🕐 Under 15 min", value: 15 },
   { label: "🕑 Under 30 min", value: 30 },
   { label: "🕒 Under 45 min", value: 45 },
@@ -926,8 +924,8 @@ export default function App() {
           <Dropdown icon="🥗" value={mealStyle} onChange={setMealStyle} options={MEAL_STYLES} placeholder="Any dietary style…"/>
           {tab==="cook"&&mode==="random"&&<>
             <Dropdown icon="🍽️" value={mealType} onChange={setMealType} options={MEAL_TYPES} placeholder="What type of dish?…"/>
-            <Dropdown icon="⏱️" value={timeFilter} onChange={v=>setTimeFilter(Number(v))} options={TIME_FILTERS} placeholder="Any cooking time…"/>
-            <Dropdown icon="📊" value={difficultyFilter} onChange={setDifficultyFilter} options={DIFFICULTY_FILTERS} placeholder="Any difficulty…"/>
+            <Dropdown icon="⏱️" value={timeFilter} onChange={v=>setTimeFilter(Number(v))} options={TIME_FILTERS} placeholder="Select cooking time…"/>
+            <Dropdown icon="📊" value={difficultyFilter} onChange={setDifficultyFilter} options={DIFFICULTY_FILTERS} placeholder="Select difficulty…"/>
           </>}
           <Dropdown icon="🌐" value={language} onChange={setLanguage} options={LANGUAGES} placeholder="Language…"/>
           {tab==="cook"&&mode==="pantry"&&<div style={{ padding:"13px 16px", borderRadius:14, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.04)" }}>
