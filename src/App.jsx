@@ -702,18 +702,28 @@ export default function App() {
   const toggleDarkMode = () => { const next = !darkMode; setDarkMode(next); save("darkMode", next); };
   const toggleFav = async () => {
     if (!recipe) return;
+    if (!user) { setShowSignInPrompt(true); return; }
     const exists = favourites.some(f => f.name === recipe.name);
     let next;
     if (exists) {
       next = favourites.filter(f => f.name !== recipe.name);
-      if (user) try { await removeFavourite(user.uid, recipe.name); } catch(e) {}
+      try { await removeFavourite(user.uid, recipe.name); } catch(e) {}
     } else {
-      const favRecipe = { ...recipe, image: recipeImage, savedAt: Date.now(), cuisine };
+      const favRecipe = { ...recipe, image: recipeImage || null, savedAt: Date.now(), cuisine };
       next = [favRecipe, ...favourites].slice(0, 50);
-      if (user) try { await saveFavourite(user.uid, favRecipe); } catch(e) {}
+      try { await saveFavourite(user.uid, favRecipe); } catch(e) { console.error("Save fav error:", e); }
     }
     setFavourites(next); save("favourites", next);
   };
+
+  // After sign in, auto-save if user clicked save before
+  const [pendingSave, setPendingSave] = useState(false);
+  useEffect(() => {
+    if (user && pendingSave && recipe) {
+      toggleFav();
+      setPendingSave(false);
+    }
+  }, [user]);
   const isFav = recipe ? favourites.some(f => f.name === recipe.name) : false;
 
   const addPantryItem=(e)=>{if(e.key==="Enter"||e.key===","){e.preventDefault();const val=pantryInput.trim().replace(/,$/,"");if(val&&!pantryItems.includes(val))setPantryItems([...pantryItems,val]);setPantryInput("");}};
@@ -1101,15 +1111,9 @@ export default function App() {
             </div>
 
             {/* Save Recipe Button */}
-            {user ? (
-              <button onClick={toggleFav} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid "+(isFav?"rgba(255,122,0,0.5)":"rgba(255,255,255,0.08)"), background:isFav?"rgba(255,122,0,0.1)":"rgba(255,255,255,0.03)", color:isFav?"#FF7A00":"rgba(255,255,255,0.5)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, transition:"all 0.2s", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-                {isFav ? "❤️ Recipe Saved!" : "🤍 Save Recipe"}
-              </button>
-            ) : (
-              <button onClick={()=>setShowSignInPrompt(true)} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.03)", color:"rgba(255,255,255,0.5)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-                🤍 Save Recipe
-              </button>
-            )}
+            <button onClick={toggleFav} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid "+(isFav?"rgba(255,122,0,0.5)":"rgba(255,255,255,0.08)"), background:isFav?"rgba(255,122,0,0.1)":"rgba(255,255,255,0.03)", color:isFav?"#FF7A00":"rgba(255,255,255,0.5)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, transition:"all 0.2s", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+              {isFav ? "❤️ Recipe Saved!" : "🤍 Save Recipe"}
+            </button>
 
             {/* Made This Button */}
             <button onClick={()=>setMadeThis(!madThis)} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid "+(madThis?"rgba(52,211,153,0.5)":"rgba(255,255,255,0.08)"), background:madThis?"rgba(52,211,153,0.1)":"rgba(255,255,255,0.03)", color:madThis?"#34d399":"rgba(255,255,255,0.4)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48, marginBottom:10, transition:"all 0.2s" }}>
