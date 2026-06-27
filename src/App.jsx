@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { signInWithGoogle, logOut, onAuthChange, saveFavourite, removeFavourite, getUserData } from "./firebase.js";
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
 const ALL_CUISINES = [
@@ -668,18 +669,50 @@ export default function App() {
   const [userRating, setUserRating] = useState(null);
   const [madThis, setMadeThis] = useState(false);
   const [excludedRestaurants, setExcludedRestaurants] = useState([]);
+  const [user, setUser] = useState(null);
+  const [userLoading, setUserLoading] = useState(true);
   const [btnHover, setBtnHover] = useState(false);
   const [heroImg] = useState(()=>HERO_IMAGES[Math.floor(Math.random()*HERO_IMAGES.length)]);
   const [shuffledChips] = useState(()=>[...QUICK_CHIPS].sort(()=>Math.random()-0.5));
   const todayCuisine = ALL_CUISINES[new Date().getDate()%ALL_CUISINES.length];
 
+  // Firebase auth listener
+  useEffect(() => {
+    const unsub = onAuthChange(async (firebaseUser) => {
+      setUser(firebaseUser);
+      setUserLoading(false);
+      if (firebaseUser) {
+        // Load favourites from Firestore
+        try {
+          const data = await getUserData(firebaseUser.uid);
+          if (data.favourites) setFavourites(data.favourites);
+        } catch(e) {}
+      }
+    });
+    return unsub;
+  }, []);
+
+  const handleSignIn = async () => {
+    try { await signInWithGoogle(); } catch(e) { console.error(e); }
+  };
+
+  const handleSignOut = async () => {
+    try { await logOut(); setFavourites([]); } catch(e) {}
+  };
+
   const toggleDarkMode = () => { const next = !darkMode; setDarkMode(next); save("darkMode", next); };
-  const toggleFav = () => {
+  const toggleFav = async () => {
     if (!recipe) return;
     const exists = favourites.some(f => f.name === recipe.name);
     let next;
-    if (exists) { next = favourites.filter(f => f.name !== recipe.name); }
-    else { next = [{ ...recipe, image: recipeImage, savedAt: Date.now(), cuisine }, ...favourites].slice(0, 50); }
+    if (exists) {
+      next = favourites.filter(f => f.name !== recipe.name);
+      if (user) try { await removeFavourite(user.uid, recipe.name); } catch(e) {}
+    } else {
+      const favRecipe = { ...recipe, image: recipeImage, savedAt: Date.now(), cuisine };
+      next = [favRecipe, ...favourites].slice(0, 50);
+      if (user) try { await saveFavourite(user.uid, favRecipe); } catch(e) {}
+    }
     setFavourites(next); save("favourites", next);
   };
   const isFav = recipe ? favourites.some(f => f.name === recipe.name) : false;
