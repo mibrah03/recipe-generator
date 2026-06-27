@@ -117,6 +117,15 @@ const fetchBestImage = async (recipeName) => {
   return img;
 };
 
+// ── AMAZON AFFILIATE ─────────────────────────────────────────────────────────
+const AMAZON_TAG = "foodcontinent-20";
+
+const getAmazonLink = (ingredient) => {
+  // Clean ingredient text to get just the item name
+  const clean = ingredient.replace(/[\d\/\s]*(cup|tbsp|tsp|g|kg|oz|lb|ml|l|clove|cloves|piece|pieces|slice|slices|pinch|handful|bunch|can|cans|package|pkg)s?\s*/gi, "").replace(/,.*$/, "").trim();
+  return `https://www.amazon.com/s?k=${encodeURIComponent(clean + " cooking")}&tag=${AMAZON_TAG}`;
+};
+
 // ── COMPONENTS ────────────────────────────────────────────────────────────────
 function Dropdown({ icon, value, onChange, options, placeholder }) {
   const [open, setOpen] = useState(false);
@@ -204,6 +213,7 @@ function ShoppingList({ ingredients, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
@@ -241,6 +251,7 @@ function CookingMode({ recipe, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
@@ -354,6 +365,7 @@ function ShareImageModal({ recipe, image, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
@@ -416,6 +428,7 @@ function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
@@ -500,6 +513,7 @@ function RecipeSearchModal({ onClose, onSelect }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
@@ -548,6 +562,7 @@ function SubstitutionModal({ ingredient, cuisine, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
@@ -588,6 +603,7 @@ function MapView({ restaurants, cuisine, onClose }) {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
@@ -897,12 +913,15 @@ export default function App() {
                 <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,122,0,0.8)", textTransform:"uppercase", letterSpacing:1.5 }}>Ingredients</p>
                 <button onClick={()=>setShowShopping(true)} style={{ background:"rgba(255,122,0,0.1)", border:"1px solid rgba(255,122,0,0.25)", borderRadius:20, padding:"4px 10px", color:"#FF7A00", fontSize:10, fontWeight:700, cursor:"pointer", minHeight:28 }}>🛒 List</button>
               </div>
-              {recipe.ingredients.map((ing,i)=><div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:10, padding:"8px 0", borderBottom:i<recipe.ingredients.length-1?"1px solid rgba(255,255,255,0.04)":"none", minHeight:36 }}>
+              {recipe.ingredients.map((ing,i)=><div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, padding:"8px 0", borderBottom:i<recipe.ingredients.length-1?"1px solid rgba(255,255,255,0.04)":"none", minHeight:36 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10, flex:1 }}>
                   <span style={{ width:5, height:5, borderRadius:"50%", background:"#FF7A00", flexShrink:0 }}/>
                   <span style={{ fontSize:13, color:"rgba(255,255,255,0.75)" }}>{scaleIng(ing)}</span>
                 </div>
-                <button onClick={()=>setSubIngredient(ing.replace(/[\d\/\s]*(cup|tbsp|tsp|g|kg|oz|lb|ml|l|clove|piece|slice)s?\s*/gi,"").trim())} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"3px 8px", color:"rgba(255,255,255,0.3)", fontSize:10, cursor:"pointer", flexShrink:0, whiteSpace:"nowrap" }}>Sub?</button>
+                <div style={{ display:"flex", gap:5, flexShrink:0 }}>
+                  <button onClick={()=>setSubIngredient(ing.replace(/[\d\/\s]*(cup|tbsp|tsp|g|kg|oz|lb|ml|l|clove|piece|slice)s?\s*/gi,"").trim())} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"3px 8px", color:"rgba(255,255,255,0.3)", fontSize:10, cursor:"pointer", whiteSpace:"nowrap" }}>Sub?</button>
+                  <a href={getAmazonLink(ing)} target="_blank" rel="noopener noreferrer" style={{ background:"rgba(255,153,0,0.1)", border:"1px solid rgba(255,153,0,0.3)", borderRadius:20, padding:"3px 8px", color:"#FF9900", fontSize:10, fontWeight:700, whiteSpace:"nowrap", textDecoration:"none", display:"flex", alignItems:"center" }}>🛒</a>
+                </div>
               </div>)}
             </div>
             <div style={{ marginBottom:16 }}>
@@ -983,6 +1002,7 @@ export default function App() {
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
+        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:400, margin:"4px auto 0" }}>Food Continent is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
       </div>
       </div>
     </div>
