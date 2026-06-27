@@ -670,6 +670,9 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [userLoading, setUserLoading] = useState(true);
   const [showSignInPrompt, setShowSignInPrompt] = useState(false);
+  const [dishOptions, setDishOptions] = useState(null);
+  const [optionImages, setOptionImages] = useState({});
+  const [loadingOptions, setLoadingOptions] = useState(false);
   const [btnHover, setBtnHover] = useState(false);
   const [heroImg] = useState(()=>HERO_IMAGES[Math.floor(Math.random()*HERO_IMAGES.length)]);
   const [shuffledChips] = useState(()=>[...QUICK_CHIPS].sort(()=>Math.random()-0.5));
@@ -750,6 +753,30 @@ export default function App() {
     const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":import.meta.env.VITE_ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})});
     const data=await res.json();
     return data.content.map(i=>i.text||"").join("").replace(/```json|```/g,"").trim();
+  };
+
+  const generateOptions = async () => {
+    if (!cuisine) { setError("Search for a cuisine first"); return; }
+    if (mode === "random" && !mealType) { setError("Pick a meal type"); return; }
+    if (mode === "pantry" && pantryItems.length === 0) { setError("Add at least one ingredient"); return; }
+    setError(""); setLoadingOptions(true); setDishOptions(null); setRecipe(null); setRecipeImage(null);
+    const styleText = mealStyle ? ` Must be ${mealStyle}.` : "";
+    const prompt = mode === "pantry"
+      ? `Suggest 6 different authentic ${cuisine} dish ideas using these ingredients: ${pantryItems.join(", ")}.${styleText}`
+      : `Suggest 6 different authentic ${cuisine} ${mealType} dish ideas.${styleText}`;
+    try {
+      const text = await callClaude(`${prompt} Respond ONLY with JSON: {"dishes":[{"name":"Dish Name","description":"One enticing sentence","time":25,"difficulty":"Easy","emoji":"🍜"}]}`);
+      const parsed = JSON.parse(text);
+      setDishOptions(parsed.dishes);
+      // Fetch images for all dishes in parallel
+      const imgs = {};
+      await Promise.all(parsed.dishes.map(async (dish) => {
+        const img = await fetchBestImage(dish.name);
+        if (img) imgs[dish.name] = img;
+      }));
+      setOptionImages(imgs);
+    } catch(e) { setError("Something went wrong. Try again!"); }
+    setLoadingOptions(false);
   };
 
   const generateRecipe=async(overridePrompt)=>{
@@ -992,10 +1019,50 @@ export default function App() {
         )}
 
         {/* CTA */}
-        <button onClick={tab==="cook"?()=>generateRecipe():()=>findRestaurants(false)} disabled={loading} onMouseEnter={()=>setBtnHover(true)} onMouseLeave={()=>setBtnHover(false)} style={{ width:"100%", padding:"17px", borderRadius:16, border:"none", background:loading?"#1A1A22":"linear-gradient(135deg,#FF7A00 0%,#FFC857 100%)", color:loading?"#444":"#0B0B0F", fontSize:15, fontWeight:800, cursor:loading?"not-allowed":"pointer", boxShadow:loading?"none":btnHover?"0 8px 40px rgba(255,122,0,0.6)":"0 4px 24px rgba(255,122,0,0.35)", transition:"all 0.25s", transform:btnHover&&!loading?"translateY(-1px)":"none", marginBottom:24, minHeight:56 }}>
-          {loading?<span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}><span style={{ width:16, height:16, borderRadius:"50%", border:"2px solid #333", borderTopColor:"#666", animation:"spin 0.8s linear infinite", display:"inline-block" }}/>Finding the perfect option…</span>
-            :tab==="eat"?"📍 Find Restaurants Near Me":mode==="pantry"?"🧺 Cook With What I Have":"✨ Generate My Recipe"}
+        <button onClick={tab==="cook"?()=>generateOptions():()=>findRestaurants(false)} disabled={loading||loadingOptions} onMouseEnter={()=>setBtnHover(true)} onMouseLeave={()=>setBtnHover(false)} style={{ width:"100%", padding:"17px", borderRadius:16, border:"none", background:loading?"#1A1A22":"linear-gradient(135deg,#FF7A00 0%,#FFC857 100%)", color:loading?"#444":"#0B0B0F", fontSize:15, fontWeight:800, cursor:loading?"not-allowed":"pointer", boxShadow:loading?"none":btnHover?"0 8px 40px rgba(255,122,0,0.6)":"0 4px 24px rgba(255,122,0,0.35)", transition:"all 0.25s", transform:btnHover&&!loading?"translateY(-1px)":"none", marginBottom:24, minHeight:56 }}>
+          {(loading||loadingOptions)?<span style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}><span style={{ width:16, height:16, borderRadius:"50%", border:"2px solid #333", borderTopColor:"#666", animation:"spin 0.8s linear infinite", display:"inline-block" }}/>{loadingOptions?"🍽️ Finding options…":"✨ Generating recipe…"}</span>
+            :tab==="eat"?"📍 Find Restaurants Near Me":mode==="pantry"?"🧺 Show Me Options":"🍽️ Show Me Options"}
         </button>
+
+        {/* DISH OPTIONS GRID */}
+        {dishOptions && !recipe && (
+          <div style={{ animation:"fadeUp 0.5s ease", marginBottom:16 }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:14 }}>
+              <p style={{ fontSize:13, fontWeight:700, color:textPrimary }}>Pick a dish you like 👇</p>
+              <button onClick={()=>{ setDishOptions(null); setOptionImages({}); }} style={{ background:"transparent", border:"1px solid rgba(255,255,255,0.1)", borderRadius:20, padding:"5px 12px", color:"rgba(255,255,255,0.3)", fontSize:11, cursor:"pointer" }}>✕ Clear</button>
+            </div>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:10 }}>
+              {dishOptions.map((dish, i) => (
+                <div key={i} onClick={async () => {
+                  setDishOptions(null);
+                  setRecipeImage(optionImages[dish.name] || null);
+                  await generateRecipe(`Generate a full authentic ${cuisine} recipe for "${dish.name}".${mealStyle ? ` Must be ${mealStyle}.` : ""}`);
+                }} style={{ borderRadius:16, overflow:"hidden", border:"1px solid "+cardBorder, background:cardBg, cursor:"pointer", transition:"all 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.border="1px solid rgba(255,122,0,0.5)"}
+                onMouseLeave={e => e.currentTarget.style.border="1px solid "+cardBorder}>
+                  {/* Dish image */}
+                  <div style={{ height:110, background:"#1A1A22", position:"relative", overflow:"hidden" }}>
+                    {optionImages[dish.name]
+                      ? <img src={optionImages[dish.name]} alt={dish.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} onError={e=>e.currentTarget.style.display="none"}/>
+                      : <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:36, background:"linear-gradient(90deg,#1A1A22 25%,#242430 50%,#1A1A22 75%)", backgroundSize:"200% 100%", animation:"shimmer 1.5s infinite" }}>{dish.emoji||"🍽️"}</div>}
+                    <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,transparent 50%,rgba(0,0,0,0.7) 100%)" }}/>
+                    <div style={{ position:"absolute", bottom:6, left:8, right:8 }}>
+                      <p style={{ fontSize:12, fontWeight:700, color:"#fff", marginBottom:2, lineHeight:1.3 }}>{dish.name}</p>
+                    </div>
+                  </div>
+                  {/* Dish info */}
+                  <div style={{ padding:"10px 12px" }}>
+                    <p style={{ fontSize:10, color:textSecondary, lineHeight:1.4, marginBottom:8 }}>{dish.description}</p>
+                    <div style={{ display:"flex", gap:6 }}>
+                      <span style={{ background:"rgba(255,122,0,0.1)", border:"1px solid rgba(255,122,0,0.2)", borderRadius:20, padding:"2px 8px", fontSize:10, color:"#FFC857", fontWeight:600 }}>⏱ {dish.time}m</span>
+                      <span style={{ background:"rgba(255,122,0,0.1)", border:"1px solid rgba(255,122,0,0.2)", borderRadius:20, padding:"2px 8px", fontSize:10, color:"#FFC857", fontWeight:600 }}>{dish.difficulty}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* RECIPE CARD */}
         {recipe&&<div style={{ animation:"fadeUp 0.5s ease", borderRadius:20, overflow:"hidden", border:"1px solid rgba(255,255,255,0.08)", background:"#121218", boxShadow:"0 24px 80px rgba(0,0,0,0.6)", marginBottom:16 }}>
@@ -1120,7 +1187,10 @@ export default function App() {
               {madThis?"✅ Made This! Great choice 🍳":"👨‍🍳 I Made This!"}
             </button>
 
-            <button onClick={()=>generateRecipe()} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid rgba(255,122,0,0.25)", background:"transparent", color:"#FF7A00", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48 }}>🔄 Generate Another</button>
+            <div style={{ display:"flex", gap:8 }}>
+              <button onClick={()=>{ setRecipe(null); setRecipeImage(null); generateOptions(); }} style={{ flex:1, padding:"13px", borderRadius:12, border:"1px solid rgba(255,255,255,0.1)", background:"rgba(255,255,255,0.03)", color:"rgba(255,255,255,0.4)", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48 }}>← Back to Options</button>
+              <button onClick={()=>generateOptions()} style={{ flex:1, padding:"13px", borderRadius:12, border:"1px solid rgba(255,122,0,0.25)", background:"transparent", color:"#FF7A00", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48 }}>🔄 New Options</button>
+            </div>
           </div>
         </div>}
 
