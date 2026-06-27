@@ -221,14 +221,14 @@ function ShoppingList({ ingredients, onClose }) {
           </div>)}
         </div>
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
@@ -259,14 +259,14 @@ function CookingMode({ recipe, onClose }) {
         {step<total-1?<button onClick={()=>setStep(step+1)} style={{ flex:2, padding:"15px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#FF7A00,#FFC857)", color:"#0B0B0F", fontSize:14, fontWeight:800, cursor:"pointer", minHeight:52 }}>Next Step →</button>
         :<button onClick={onClose} style={{ flex:2, padding:"15px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#34d399,#059669)", color:"#fff", fontSize:14, fontWeight:800, cursor:"pointer", minHeight:52 }}>🎉 Finished!</button>}
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
@@ -373,14 +373,14 @@ function ShareImageModal({ recipe, image, onClose }) {
           <button onClick={share} style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#FF7A00,#FFC857)", color:"#0B0B0F", fontSize:13, fontWeight:800, cursor:"pointer" }}>📤 Share</button>
         </div>
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
@@ -436,14 +436,14 @@ function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
           </div>
         </div>
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
@@ -521,14 +521,14 @@ function RecipeSearchModal({ onClose, onSelect }) {
           </div>)}
         </div>
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
@@ -570,14 +570,14 @@ function SubstitutionModal({ ingredient, cuisine, onClose }) {
           <p style={{ fontSize:12, color:"rgba(255,255,255,0.45)" }}>{s.note}</p>
         </div>)}
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
@@ -611,14 +611,14 @@ function MapView({ restaurants, cuisine, onClose }) {
           </a>)}
         </div>
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
@@ -797,6 +797,18 @@ export default function App() {
   const scaleIng=(ing)=>{if(!recipe)return ing;const ratio=servings/(recipe.servings||4);if(ratio===1)return ing;return ing.replace(/(\d+(\.\d+)?)/g,m=>{const s=parseFloat(m)*ratio;return s%1===0?s:s.toFixed(1);});};
   const reset=()=>{setRecipe(null);setRestaurants(null);setRecipeImage(null);setDishImages({});setNutrition(null);setError("");setFeedback(null);};
 
+  const bg = darkMode ? '#0B0B0F' : '#FFFFFF';
+  const cardBg = darkMode ? '#121218' : '#F5F5F5';
+  const cardBorder = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)';
+  const textPrimary = darkMode ? '#ffffff' : '#111111';
+  const textSecondary = darkMode ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.5)';
+  const textMuted = darkMode ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.35)';
+  const inputBg = darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+  const inputBorder = darkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.12)';
+  const chipBg = darkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)';
+  const chipBorder = darkMode ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.1)';
+  const chipColor = darkMode ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+
   const css=`
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     @keyframes spin{to{transform:rotate(360deg);}}
@@ -814,7 +826,7 @@ export default function App() {
   `;
 
   return (
-    <div style={{ minHeight:"100vh", background:darkMode?"#0B0B0F":"#F8F8F2", fontFamily:"'Inter','SF Pro Display',-apple-system,system-ui,sans-serif", color:darkMode?"#fff":"#1a1a2e", overflowX:"hidden", transition:"background 0.3s, color 0.3s" }}>
+    <div style={{ minHeight:"100vh", background:bg, fontFamily:"'Inter','SF Pro Display',-apple-system,system-ui,sans-serif", color:darkMode?"#fff":"#111", overflowX:"hidden", transition:"background 0.3s, color 0.3s" }}>
       <style>{css}</style>
       {showCooking&&recipe&&<CookingMode recipe={recipe} onClose={()=>setShowCooking(false)}/>}
       {showShopping&&recipe&&<ShoppingList ingredients={recipe.ingredients.map(i=>scaleIng(i))} onClose={()=>setShowShopping(false)}/>}
@@ -851,9 +863,9 @@ export default function App() {
 
         {/* Cook / Eat Out */}
         <div style={{ marginTop:-16, marginBottom:20 }}>
-          <div style={{ display:"flex", background:"rgba(255,255,255,0.04)", borderRadius:18, padding:4, border:"1px solid rgba(255,255,255,0.06)", position:"relative" }}>
+          <div style={{ display:"flex", background:darkMode?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.05)", borderRadius:18, padding:4, border:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), position:"relative" }}>
             <div style={{ position:"absolute", top:4, bottom:4, left:tab==="cook"?4:"calc(50% + 2px)", width:"calc(50% - 6px)", background:"linear-gradient(135deg,#FF7A00,#FFC857)", borderRadius:14, transition:"left 0.35s cubic-bezier(0.4,0,0.2,1)", boxShadow:"0 4px 20px rgba(255,122,0,0.4)" }}/>
-            {[["cook","👨‍🍳 Cook"],["eat","🍴 Eat Out"]].map(([val,lbl])=><button key={val} onClick={()=>{setTab(val);reset();setEatIngredients([]);setEatIngInput("");}} style={{ flex:1, padding:"13px 0", border:"none", background:"transparent", color:tab===val?"#0B0B0F":"rgba(255,255,255,0.4)", fontSize:14, fontWeight:tab===val?800:500, cursor:"pointer", position:"relative", zIndex:1, borderRadius:14, transition:"color 0.3s", minHeight:48 }}>{lbl}</button>)}
+            {[["cook","👨‍🍳 Cook"],["eat","🍴 Eat Out"]].map(([val,lbl])=><button key={val} onClick={()=>{setTab(val);reset();setEatIngredients([]);setEatIngInput("");}} style={{ flex:1, padding:"13px 0", border:"none", background:"transparent", color:tab===val?"#0B0B0F":darkMode?"rgba(255,255,255,0.4)":"rgba(0,0,0,0.5)", fontSize:14, fontWeight:tab===val?800:500, cursor:"pointer", position:"relative", zIndex:1, borderRadius:14, transition:"color 0.3s", minHeight:48 }}>{lbl}</button>)}
           </div>
         </div>
 
@@ -861,13 +873,13 @@ export default function App() {
         <div style={{ marginBottom:18 }}>
           <p style={{ fontSize:10, fontWeight:700, color:"rgba(255,255,255,0.25)", textTransform:"uppercase", letterSpacing:1.5, marginBottom:8 }}>Quick Pick</p>
           <div style={{ display:"flex", gap:7, overflowX:"auto", paddingBottom:6, WebkitOverflowScrolling:"touch" }}>
-            {shuffledChips.map(c=>{const active=cuisine===c.value;return<button key={c.value} onClick={()=>{setCuisine(c.value);reset();}} style={{ flexShrink:0, padding:"8px 14px", borderRadius:20, border:"1px solid "+(active?"rgba(255,122,0,0.8)":"rgba(255,255,255,0.07)"), background:active?"rgba(255,122,0,0.15)":"rgba(255,255,255,0.03)", color:active?"#FF7A00":"rgba(255,255,255,0.5)", fontSize:12, fontWeight:active?700:400, cursor:"pointer", boxShadow:active?"0 0 16px rgba(255,122,0,0.2)":"none", transition:"all 0.2s", whiteSpace:"nowrap", minHeight:36 }}>{c.label}</button>;})}
+            {shuffledChips.map(c=>{const active=cuisine===c.value;return<button key={c.value} onClick={()=>{setCuisine(c.value);reset();}} style={{ flexShrink:0, padding:"8px 14px", borderRadius:20, border:"1px solid "+(active?"rgba(255,122,0,0.8)":chipBorder), background:active?"rgba(255,122,0,0.15)":chipBg, color:active?"#FF7A00":chipColor, fontSize:12, fontWeight:active?700:400, cursor:"pointer", boxShadow:active?"0 0 16px rgba(255,122,0,0.2)":"none", transition:"all 0.2s", whiteSpace:"nowrap", minHeight:36 }}>{c.label}</button>;})}
           </div>
         </div>
 
         {/* Mode Cards */}
         {tab==="cook"&&<div style={{ display:"grid", gridTemplateColumns:"repeat(2,minmax(0,1fr))", gap:10, marginBottom:18 }}>
-          {[{val:"random",icon:"🎲",title:"Surprise Me",desc:"Get a random recipe"},{val:"pantry",icon:"🧺",title:"My Ingredients",desc:"Cook what you have"}].map(item=><button key={item.val} onClick={()=>{setMode(item.val);reset();}} style={{ padding:"16px", borderRadius:16, border:"1px solid "+(mode===item.val?"rgba(255,122,0,0.5)":"rgba(255,255,255,0.06)"), background:mode===item.val?"rgba(255,122,0,0.1)":"rgba(255,255,255,0.02)", cursor:"pointer", textAlign:"left", transition:"all 0.2s", boxShadow:mode===item.val?"0 0 24px rgba(255,122,0,0.15)":"none", minHeight:90 }}>
+          {[{val:"random",icon:"🎲",title:"Surprise Me",desc:"Get a random recipe"},{val:"pantry",icon:"🧺",title:"My Ingredients",desc:"Cook what you have"}].map(item=><button key={item.val} onClick={()=>{setMode(item.val);reset();}} style={{ padding:"16px", borderRadius:16, border:"1px solid "+(mode===item.val?"rgba(255,122,0,0.5)":cardBorder), background:mode===item.val?"rgba(255,122,0,0.1)":cardBg, cursor:"pointer", textAlign:"left", transition:"all 0.2s", boxShadow:mode===item.val?"0 0 24px rgba(255,122,0,0.15)":"none", minHeight:90 }}>
             <div style={{ fontSize:22, marginBottom:6 }}>{item.icon}</div>
             <div style={{ fontSize:13, fontWeight:700, color:mode===item.val?"#FF7A00":"#fff", marginBottom:2 }}>{item.title}</div>
             <div style={{ fontSize:11, color:"rgba(255,255,255,0.3)" }}>{item.desc}</div>
@@ -960,8 +972,8 @@ export default function App() {
             </div>
           </div>
           <div style={{ padding:"20px 20px 24px" }}>
-            <h2 style={{ fontSize:22, fontWeight:800, marginBottom:6, letterSpacing:"-0.3px" }}>{recipe.name}</h2>
-            <p style={{ fontSize:13, color:"rgba(255,255,255,0.45)", marginBottom:16, lineHeight:1.6 }}>{recipe.description}</p>
+            <h2 style={{ fontSize:22, fontWeight:800, marginBottom:6, letterSpacing:"-0.3px", color:textPrimary }}>{recipe.name}</h2>
+            <p style={{ fontSize:13, color:textSecondary, marginBottom:16, lineHeight:1.6 }}>{recipe.description}</p>
             <div style={{ display:"flex", gap:8, marginBottom:16, flexWrap:"wrap" }}>
               {[{icon:"⏱",label:`${recipe.time} min`},{icon:"📊",label:recipe.difficulty},{icon:"👥",label:`${servings} servings`}].map((s,i)=><div key={i} style={{ background:"rgba(255,122,0,0.08)", border:"1px solid rgba(255,122,0,0.2)", borderRadius:20, padding:"5px 12px", fontSize:12, color:"#FFC857", fontWeight:600, display:"flex", alignItems:"center", gap:5 }}>{s.icon} {s.label}</div>)}
             </div>
@@ -985,7 +997,7 @@ export default function App() {
               {recipe.ingredients.map((ing,i)=><div key={i} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, padding:"8px 0", borderBottom:i<recipe.ingredients.length-1?"1px solid rgba(255,255,255,0.04)":"none", minHeight:36 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10, flex:1 }}>
                   <span style={{ width:5, height:5, borderRadius:"50%", background:"#FF7A00", flexShrink:0 }}/>
-                  <span style={{ fontSize:13, color:"rgba(255,255,255,0.75)" }}>{scaleIng(ing)}</span>
+                  <span style={{ fontSize:13, color:darkMode?"rgba(255,255,255,0.75)":"rgba(0,0,0,0.75)" }}>{scaleIng(ing)}</span>
                 </div>
                 <div style={{ display:"flex", gap:5, flexShrink:0 }}>
                   <button onClick={()=>setSubIngredient(ing.replace(/[\d\/\s]*(cup|tbsp|tsp|g|kg|oz|lb|ml|l|clove|piece|slice)s?\s*/gi,"").trim())} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:20, padding:"3px 8px", color:"rgba(255,255,255,0.3)", fontSize:10, cursor:"pointer", whiteSpace:"nowrap" }}>Sub?</button>
@@ -1001,7 +1013,7 @@ export default function App() {
               {recipe.steps.map((step,i)=><div key={i} style={{ display:"flex", gap:12, marginBottom:14, alignItems:"flex-start" }}>
                 <div style={{ minWidth:26, height:26, borderRadius:"50%", background:"linear-gradient(135deg,#FF7A00,#FFC857)", color:"#0B0B0F", fontWeight:800, fontSize:11, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{i+1}</div>
                 <div style={{ flex:1 }}>
-                  <p style={{ fontSize:13, color:"rgba(255,255,255,0.7)", lineHeight:1.65, marginBottom:recipe.stepTimes?.[i]>0?6:0 }}>{step}</p>
+                  <p style={{ fontSize:13, color:darkMode?"rgba(255,255,255,0.7)":"rgba(0,0,0,0.7)", lineHeight:1.65, marginBottom:recipe.stepTimes?.[i]>0?6:0 }}>{step}</p>
                   {recipe.stepTimes?.[i]>0&&<Timer seconds={recipe.stepTimes[i]}/>}
                 </div>
               </div>)}
@@ -1111,14 +1123,14 @@ export default function App() {
           <button onClick={()=>findRestaurants(true)} style={{ width:"100%", padding:"13px", borderRadius:12, border:"1px solid rgba(255,122,0,0.25)", background:"transparent", color:"#FF7A00", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:48 }}>🔄 Find Different Restaurants</button>
         </div>}
       {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid rgba(255,255,255,0.06)", marginTop:20, background:"rgba(0,0,0,0.2)" }}>
+      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
         <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.4)", marginBottom:16 }}>Food Continent</p>
+        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
         <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:"rgba(255,255,255,0.3)", fontSize:12, textDecoration:"none" }}>Terms of Service</a>
+          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
+          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
+          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
+          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
         </div>
         <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
         <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
