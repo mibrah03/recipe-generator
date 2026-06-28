@@ -3,7 +3,7 @@ const cache = new Map();
 const rateLimitMap = new Map();
 
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-const RATE_LIMIT = 15; // max requests per IP per day
+const RATE_LIMIT = 10; // max requests per IP per day
 const RATE_WINDOW = 24 * 60 * 60 * 1000; // 24 hours
 
 function getCacheKey(prompt) {
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-haiku-4-5-20251001",
         max_tokens: maxTokens,
         messages: [{ role: "user", content: prompt }]
       })

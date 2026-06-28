@@ -401,7 +401,7 @@ function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
         const res = await fetch("/api/claude", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({ prompt:`Tell me about the ${cuisine} dish "${dish}" from a ${restaurantName}. Respond ONLY with JSON: {"description":"2 sentences","taste":"Flavor profile","ingredients":["ing1","ing2","ing3","ing4"],"allergens":["if any"],"spiceLevel":"Mild/Medium/Hot/Very Hot","calories":"approx per serving"}`, maxTokens:600 })
+          body:JSON.stringify({ prompt:`Tell me about the ${cuisine} dish "${dish}". Respond ONLY with JSON: {"description":"1 sentence","taste":"Flavor in 5 words","ingredients":["ing1","ing2","ing3"],"spiceLevel":"Mild/Medium/Hot","calories":"approx cal"}`, maxTokens:250 })
         });
         const data = await res.json();
         setInfo(JSON.parse(data.text));
@@ -494,7 +494,7 @@ function RecipeSearchModal({ onClose, onSelect }) {
       const res = await fetch("/api/claude", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({ prompt:`Suggest 5 recipes matching "${query}". Respond ONLY with JSON: {"results":[{"name":"Recipe name","cuisine":"Cuisine type","time":25,"difficulty":"Easy","description":"One sentence"}]}`, maxTokens:800 })
+        body:JSON.stringify({ prompt:`Suggest 4 recipes matching "${query}". Respond ONLY with JSON: {"results":[{"name":"Recipe name","cuisine":"Cuisine","time":25,"difficulty":"Easy","description":"Brief description"}]}`, maxTokens:400 })
       });
       const data = await res.json();
       const parsed = JSON.parse(data.text);
@@ -556,7 +556,7 @@ function SubstitutionModal({ ingredient, cuisine, onClose }) {
         const res = await fetch("/api/claude", {
           method:"POST",
           headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({ prompt:`What can I substitute for "${ingredient}" in ${cuisine} cooking? Give 3 options. Respond ONLY with JSON: {"substitutes":[{"name":"substitute name","ratio":"how much to use","note":"brief tip"}]}`, maxTokens:400 })
+          body:JSON.stringify({ prompt:`Quick substitutes for "${ingredient}" in cooking. Respond ONLY with JSON: {"substitutes":[{"name":"name","ratio":"amount","note":"tip"}]}`, maxTokens:200 })
         });
         const data = await res.json();
         setResult(JSON.parse(data.text));
@@ -786,9 +786,9 @@ export default function App() {
       ? `Suggest 6 different authentic ${cuisine} dish ideas using these ingredients: ${pantryItems.join(", ")}.${styleText}`
       : `Suggest 6 different authentic ${cuisine} ${mealType} dish ideas.${styleText}`;
     try {
-      const text = await callClaude(`${prompt} Respond ONLY with JSON: {"dishes":[{"name":"Dish Name","description":"One enticing sentence","time":25,"difficulty":"Easy","emoji":"🍜"}]}`);
+      const text = await callClaude(`${prompt} Respond ONLY with JSON: {"dishes":[{"name":"Dish Name","description":"One enticing sentence","time":25,"difficulty":"Easy","emoji":"🍜"}]}`, 500);
       const parsed = JSON.parse(text);
-      setDishOptions(parsed.dishes);
+      setDishOptions(parsed.dishes.slice(0,4));
       // Fetch images for all dishes in parallel
       const imgs = {};
       await Promise.all(parsed.dishes.map(async (dish) => {
@@ -811,7 +811,7 @@ export default function App() {
     const langText=language!=="English"?` Translate the entire recipe into ${language}.`:"";
     const prompt=overridePrompt||(mode==="random"?`Generate a random authentic ${cuisine} ${mealType} recipe.${styleText}${timeText}${diffText}${langText}`:`Generate an authentic ${cuisine} recipe using ONLY or mostly these ingredients: ${pantryItems.join(", ")}. Assume basic staples available.${styleText}${timeText}${diffText}${langText}`);
     try {
-      const text=await callClaude(`${prompt} Respond ONLY with JSON: {"name":"Recipe Name","description":"One sentence","time":30,"difficulty":"Easy","servings":4,"ingredients":["item with qty"],"steps":["Step 1"],"stepTimes":[0,300,0],"tip":"Chef tip","calories":450,"protein":28,"carbs":35,"fat":18}`);
+      const text=await callClaude(`${prompt} Respond ONLY with JSON: {"name":"Recipe Name","description":"One sentence","time":30,"difficulty":"Easy","servings":4,"ingredients":["item with qty"],"steps":["Step 1"],"stepTimes":[0,300,0],"tip":"Chef tip","calories":450,"protein":28,"carbs":35,"fat":18}`, 800, isPersonal);
       const parsed=JSON.parse(text);
       setRecipe(parsed);setServings(parsed.servings||4);setMadeThis(false);setUserRating(null);
       if(parsed.calories)setNutrition({calories:parsed.calories,protein:parsed.protein,carbs:parsed.carbs,fat:parsed.fat});
@@ -853,19 +853,19 @@ export default function App() {
         const placesRes=await fetch("/api/places",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat,lng,cuisine})});
         const placesData=await placesRes.json();
         if(placesRes.ok&&placesData.places?.length>0){
-          const realPlaces=placesData.places.filter(p=>!currentExcluded.includes(p.name)).slice(0,5);
-          const enrichText=await callClaude(`These are real ${cuisine} restaurants near ${locationLabel}: ${realPlaces.map(p=>p.name).join(", ")}.${styleText}${eatIngText} For each suggest 8 signature dishes. Respond ONLY with JSON: {"restaurants":[{"name":"Exact name","vibe":"Atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5","Dish 6","Dish 7","Dish 8"]}]}`);
+          const realPlaces=placesData.places.filter(p=>!currentExcluded.includes(p.name)).slice(0,3);
+          const enrichText=await callClaude(`These are real ${cuisine} restaurants near ${locationLabel}: ${realPlaces.slice(0,3).map(p=>p.name).join(", ")}.${styleText}${eatIngText} For each suggest 5 signature dishes. Respond ONLY with JSON: {"restaurants":[{"name":"Exact name","vibe":"Atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5"]}]}`, 600);
           const enriched=JSON.parse(enrichText);
           restaurantData=enriched.restaurants.map((r,idx)=>{const real=realPlaces[idx];const priceMap={"PRICE_LEVEL_FREE":"Free","PRICE_LEVEL_INEXPENSIVE":"$","PRICE_LEVEL_MODERATE":"$$","PRICE_LEVEL_EXPENSIVE":"$$$","PRICE_LEVEL_VERY_EXPENSIVE":"$$$$"};return{...r,name:real?.name||r.name,address:real?.address||"",rating:real?.rating||null,priceRange:real?.priceLevel?(priceMap[real.priceLevel]||"$$"):"$$",isOpen:real?.isOpen??null,placeId:real?.placeId||null,mapsUri:real?.mapsUri||null,isReal:true,lat,lng};});
         } else throw new Error("No places");
       } catch(e) {
-        const text=await callClaude(`User wants ${cuisine} food near ${locationLabel}.${styleText}${eatIngText}${excludeText} Suggest 5 DIFFERENT ${cuisine} restaurant types with 8 signature dishes each. Respond ONLY with JSON: {"restaurants":[{"name":"Name","vibe":"Atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5","Dish 6","Dish 7","Dish 8"],"priceRange":"$$","searchTip":"Google Maps term"}]}`);
+        const text=await callClaude(`User wants ${cuisine} food near ${locationLabel}.${styleText}${eatIngText}${excludeText} Suggest 3 DIFFERENT ${cuisine} restaurant types with 5 signature dishes each. Respond ONLY with JSON: {"restaurants":[{"name":"Name","vibe":"Atmosphere","menu":["Dish 1","Dish 2","Dish 3","Dish 4","Dish 5"],"priceRange":"$$","searchTip":"Google Maps term"}]}`, 500);
         const parsed=JSON.parse(text);
         restaurantData=parsed.restaurants.map(r=>({...r,isReal:false,lat,lng}));
       }
       setRestaurants(restaurantData);
       const imgs={};
-      for(const r of restaurantData){for(const dish of(r.menu||[]).slice(0,8)){if(!imgs[dish]){const img=await fetchDishImage(dish);if(img)imgs[dish]=img;}}}
+      for(const r of restaurantData){for(const dish of(r.menu||[]).slice(0,4)){if(!imgs[dish]){const img=await fetchDishImage(dish);if(img)imgs[dish]=img;}}}
       setDishImages(imgs);
     } catch(err){setError("Something went wrong. Try again!");}
     setLoading(false);
