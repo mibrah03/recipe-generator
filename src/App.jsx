@@ -398,9 +398,13 @@ function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
     const fetch_ = async () => {
       setLoading(true);
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers:{ "Content-Type":"application/json","x-api-key":import.meta.env.VITE_ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true" }, body:JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:600, messages:[{ role:"user", content:`Tell me about the ${cuisine} dish "${dish}" from a ${restaurantName}. Respond ONLY with JSON: {"description":"2 sentences","taste":"Flavor profile","ingredients":["ing1","ing2","ing3","ing4"],"allergens":["if any"],"spiceLevel":"Mild/Medium/Hot/Very Hot","calories":"approx per serving"}` }] }) });
+        const res = await fetch("/api/claude", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({ prompt:`Tell me about the ${cuisine} dish "${dish}" from a ${restaurantName}. Respond ONLY with JSON: {"description":"2 sentences","taste":"Flavor profile","ingredients":["ing1","ing2","ing3","ing4"],"allergens":["if any"],"spiceLevel":"Mild/Medium/Hot/Very Hot","calories":"approx per serving"}`, maxTokens:600 })
+        });
         const data = await res.json();
-        setInfo(JSON.parse(data.content.map(i=>i.text||"").join("").replace(/```json|```/g,"").trim()));
+        setInfo(JSON.parse(data.text));
       } catch(e) {}
       setLoading(false);
     };
@@ -487,9 +491,13 @@ function RecipeSearchModal({ onClose, onSelect }) {
     if (!query.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers:{ "Content-Type":"application/json","x-api-key":import.meta.env.VITE_ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true" }, body:JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:800, messages:[{ role:"user", content:`Suggest 5 recipes matching "${query}". Respond ONLY with JSON: {"results":[{"name":"Recipe name","cuisine":"Cuisine type","time":25,"difficulty":"Easy","description":"One sentence"}]}` }] }) });
+      const res = await fetch("/api/claude", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ prompt:`Suggest 5 recipes matching "${query}". Respond ONLY with JSON: {"results":[{"name":"Recipe name","cuisine":"Cuisine type","time":25,"difficulty":"Easy","description":"One sentence"}]}`, maxTokens:800 })
+      });
       const data = await res.json();
-      const parsed = JSON.parse(data.content.map(i=>i.text||"").join("").replace(/```json|```/g,"").trim());
+      const parsed = JSON.parse(data.text);
       setResults(parsed.results||[]);
     } catch(e) {}
     setLoading(false);
@@ -545,9 +553,13 @@ function SubstitutionModal({ ingredient, cuisine, onClose }) {
   useEffect(() => {
     const fetch_ = async () => {
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers:{ "Content-Type":"application/json","x-api-key":import.meta.env.VITE_ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true" }, body:JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:400, messages:[{ role:"user", content:`What can I substitute for "${ingredient}" in ${cuisine} cooking? Give 3 options. Respond ONLY with JSON: {"substitutes":[{"name":"substitute name","ratio":"how much to use","note":"brief tip"}]}` }] }) });
+        const res = await fetch("/api/claude", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({ prompt:`What can I substitute for "${ingredient}" in ${cuisine} cooking? Give 3 options. Respond ONLY with JSON: {"substitutes":[{"name":"substitute name","ratio":"how much to use","note":"brief tip"}]}`, maxTokens:400 })
+        });
         const data = await res.json();
-        setResult(JSON.parse(data.content.map(i=>i.text||"").join("").replace(/```json|```/g,"").trim()));
+        setResult(JSON.parse(data.text));
       } catch(e) {}
       setLoading(false);
     };
@@ -749,10 +761,19 @@ export default function App() {
 
   const getLocation=()=>new Promise((res,rej)=>{if(!navigator.geolocation)rej();else navigator.geolocation.getCurrentPosition(res,rej);});
 
-  const callClaude=async(prompt,maxTokens=1200)=>{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":import.meta.env.VITE_ANTHROPIC_API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:maxTokens,messages:[{role:"user",content:prompt}]})});
+  const callClaude=async(prompt,maxTokens=1200,skipCache=false)=>{
+    const res=await fetch("/api/claude",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({prompt,maxTokens,skipCache})
+    });
     const data=await res.json();
-    return data.content.map(i=>i.text||"").join("").replace(/```json|```/g,"").trim();
+    if(res.status===429){
+      setError(data.message||"Daily limit reached. Please try again tomorrow.");
+      throw new Error("rate_limit");
+    }
+    if(!res.ok) throw new Error(data.error||"API error");
+    return data.text;
   };
 
   const generateOptions = async () => {
