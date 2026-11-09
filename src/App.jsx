@@ -219,20 +219,6 @@ function ShoppingList({ ingredients, onClose }) {
             <span style={{ fontSize:14, color:checked[i]?"rgba(255,255,255,0.25)":"rgba(255,255,255,0.8)", textDecoration:checked[i]?"line-through":"none" }}>{ing}</span>
           </div>)}
         </div>
-      {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
-        <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
-        </div>
-        <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
-        <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
-      </div>
       </div>
     </div>
   );
@@ -257,20 +243,6 @@ function CookingMode({ recipe, onClose }) {
         <button onClick={()=>setStep(Math.max(0,step-1))} disabled={step===0} style={{ flex:1, padding:"15px", borderRadius:14, border:"1px solid rgba(255,255,255,0.08)", background:"rgba(255,255,255,0.04)", color:step===0?"#333":"#fff", fontSize:14, fontWeight:700, cursor:step===0?"not-allowed":"pointer", minHeight:52 }}>← Prev</button>
         {step<total-1?<button onClick={()=>setStep(step+1)} style={{ flex:2, padding:"15px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#FF7A00,#FFC857)", color:"#0B0B0F", fontSize:14, fontWeight:800, cursor:"pointer", minHeight:52 }}>Next Step →</button>
         :<button onClick={onClose} style={{ flex:2, padding:"15px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#34d399,#059669)", color:"#fff", fontSize:14, fontWeight:800, cursor:"pointer", minHeight:52 }}>🎉 Finished!</button>}
-      {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
-        <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
-        </div>
-        <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
-        <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
-      </div>
       </div>
     </div>
   );
@@ -371,20 +343,6 @@ function ShareImageModal({ recipe, image, onClose }) {
           <button onClick={download} style={{ flex:1, padding:"12px", borderRadius:12, border:"1px solid rgba(255,122,0,0.3)", background:"rgba(255,122,0,0.1)", color:"#FF7A00", fontSize:13, fontWeight:700, cursor:"pointer" }}>⬇️ Download</button>
           <button onClick={share} style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#FF7A00,#FFC857)", color:"#0B0B0F", fontSize:13, fontWeight:800, cursor:"pointer" }}>📤 Share</button>
         </div>
-      {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
-        <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
-        </div>
-        <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
-        <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
-      </div>
       </div>
     </div>
   );
@@ -438,20 +396,6 @@ function DishDetail({ dish, image, restaurantName, cuisine, onClose }) {
             <a href={`https://www.grubhub.com/search?queryText=${encodeURIComponent(dish)}`} target="_blank" rel="noopener noreferrer" style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(255,153,0,0.1)", border:"1px solid rgba(255,153,0,0.3)", borderRadius:12, padding:"11px 6px", color:"#FF9900", fontSize:12, fontWeight:700, minHeight:44 }}>🟡 GrubHub</a>
           </div>
         </div>
-      {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
-        <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
-        </div>
-        <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
-        <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
-      </div>
       </div>
     </div>
   );
@@ -527,20 +471,6 @@ function RecipeSearchModal({ onClose, onSelect }) {
             <p style={{ fontSize:12, color:"rgba(255,255,255,0.3)" }}>{r.description}</p>
           </div>)}
         </div>
-      {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
-        <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
-        </div>
-        <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
-        <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
-      </div>
       </div>
     </div>
   );
@@ -580,20 +510,6 @@ function SubstitutionModal({ ingredient, cuisine, onClose }) {
           </div>
           <p style={{ fontSize:12, color:"rgba(255,255,255,0.45)" }}>{s.note}</p>
         </div>)}
-      {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
-        <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
-        </div>
-        <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
-        <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
-      </div>
       </div>
     </div>
   );
@@ -621,20 +537,6 @@ function MapView({ restaurants, cuisine, onClose }) {
             <div><p style={{ fontSize:13, fontWeight:600, color:"#fff", marginBottom:2 }}>{r.name}</p><p style={{ fontSize:11, color:"rgba(255,255,255,0.3)" }}>{r.address}</p></div>
           </a>)}
         </div>
-      {/* Footer */}
-      <div style={{ textAlign:"center", padding:"28px 20px 48px", borderTop:"1px solid "+(darkMode?"rgba(255,255,255,0.06)":"rgba(0,0,0,0.08)"), marginTop:20, background:darkMode?"rgba(0,0,0,0.2)":"rgba(0,0,0,0.03)" }}>
-        <div style={{ fontSize:28, marginBottom:8 }}>🍽️</div>
-        <p style={{ fontSize:13, fontWeight:700, color:textMuted, marginBottom:16 }}>Food Continent</p>
-        <div style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:16, marginBottom:16 }}>
-          <a href="/about" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>About</a>
-          <a href="/contact" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Contact</a>
-          <a href="/privacy" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Privacy Policy</a>
-          <a href="/terms" style={{ color:textMuted, fontSize:12, textDecoration:"none" }}>Terms of Service</a>
-        </div>
-        <p style={{ color:"rgba(255,255,255,0.12)", fontSize:11 }}>© 2026 Food Continent. All rights reserved.</p>
-        <p style={{ color:"rgba(255,255,255,0.1)", fontSize:10, marginTop:4 }}>AI-powered recipes and restaurant discovery</p>
-        <p style={{ color:"rgba(255,255,255,0.08)", fontSize:9, marginTop:4, maxWidth:500, margin:"4px auto 0", lineHeight:1.6 }}>Food Continent participates in affiliate programs including Amazon Associates, HelloFresh, and other programs. We may earn commissions from qualifying purchases and signups at no extra cost to you. Sponsored content is clearly labeled.</p>
-      </div>
       </div>
     </div>
   );
@@ -810,6 +712,7 @@ export default function App() {
     const diffText=difficultyFilter?` The recipe difficulty must be ${difficultyFilter}.`:"";
     const langText=language!=="English"?` Translate the entire recipe into ${language}.`:"";
     const prompt=overridePrompt||(mode==="random"?`Generate a random authentic ${cuisine} ${mealType} recipe.${styleText}${timeText}${diffText}${langText}`:`Generate an authentic ${cuisine} recipe using ONLY or mostly these ingredients: ${pantryItems.join(", ")}. Assume basic staples available.${styleText}${timeText}${diffText}${langText}`);
+    const isPersonal = mode==="pantry" || !!overridePrompt;
     try {
       const text=await callClaude(`${prompt} Respond ONLY with JSON: {"name":"Recipe Name","description":"One sentence","time":30,"difficulty":"Easy","servings":4,"ingredients":["item with qty"],"steps":["Step 1"],"stepTimes":[0,300,0],"tip":"Chef tip","calories":450,"protein":28,"carbs":35,"fat":18}`, 1600, isPersonal);
       const parsed=JSON.parse(text);
