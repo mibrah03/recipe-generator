@@ -3,7 +3,7 @@ const cache = new Map();
 const rateLimitMap = new Map();
 
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-const RATE_LIMIT = 10; // max requests per IP per day
+const RATE_LIMIT = 30; // max requests per IP per day
 const RATE_WINDOW = 24 * 60 * 60 * 1000; // 24 hours
 
 function getCacheKey(prompt) {

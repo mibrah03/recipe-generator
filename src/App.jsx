@@ -796,7 +796,7 @@ export default function App() {
         if (img) imgs[dish.name] = img;
       }));
       setOptionImages(imgs);
-    } catch(e) { setError("Something went wrong. Try again!"); }
+    } catch(e) { if(e.message!=="rate_limit") setError("Something went wrong. Try again!"); }
     setLoadingOptions(false);
   };
 
@@ -811,14 +811,14 @@ export default function App() {
     const langText=language!=="English"?` Translate the entire recipe into ${language}.`:"";
     const prompt=overridePrompt||(mode==="random"?`Generate a random authentic ${cuisine} ${mealType} recipe.${styleText}${timeText}${diffText}${langText}`:`Generate an authentic ${cuisine} recipe using ONLY or mostly these ingredients: ${pantryItems.join(", ")}. Assume basic staples available.${styleText}${timeText}${diffText}${langText}`);
     try {
-      const text=await callClaude(`${prompt} Respond ONLY with JSON: {"name":"Recipe Name","description":"One sentence","time":30,"difficulty":"Easy","servings":4,"ingredients":["item with qty"],"steps":["Step 1"],"stepTimes":[0,300,0],"tip":"Chef tip","calories":450,"protein":28,"carbs":35,"fat":18}`, 800, isPersonal);
+      const text=await callClaude(`${prompt} Respond ONLY with JSON: {"name":"Recipe Name","description":"One sentence","time":30,"difficulty":"Easy","servings":4,"ingredients":["item with qty"],"steps":["Step 1"],"stepTimes":[0,300,0],"tip":"Chef tip","calories":450,"protein":28,"carbs":35,"fat":18}`, 1600, isPersonal);
       const parsed=JSON.parse(text);
       setRecipe(parsed);setServings(parsed.servings||4);setMadeThis(false);setUserRating(null);
       if(parsed.calories)setNutrition({calories:parsed.calories,protein:parsed.protein,carbs:parsed.carbs,fat:parsed.fat});
       fetchImage(parsed.name);
       const newHistory=[{...parsed,cuisine,timestamp:Date.now()},...history].slice(0,10);
       setHistory(newHistory);
-    } catch(err){setError("Something went wrong. Try again!");}
+    } catch(err){ if(err.message!=="rate_limit") setError("Something went wrong. Try again!"); }
     setLoading(false);
   };
 
@@ -867,7 +867,7 @@ export default function App() {
       const imgs={};
       for(const r of restaurantData){for(const dish of(r.menu||[]).slice(0,4)){if(!imgs[dish]){const img=await fetchDishImage(dish);if(img)imgs[dish]=img;}}}
       setDishImages(imgs);
-    } catch(err){setError("Something went wrong. Try again!");}
+    } catch(err){ if(err.message!=="rate_limit") setError("Something went wrong. Try again!"); }
     setLoading(false);
   };
 
