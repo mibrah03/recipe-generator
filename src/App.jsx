@@ -796,7 +796,7 @@ export default function App() {
         if (img) imgs[dish.name] = img;
       }));
       setOptionImages(imgs);
-    } catch(e) { if(e.message!=="rate_limit") setError("Something went wrong. Try again!"); }
+    } catch(e) { console.error("Options error:", e); if(e.message!=="rate_limit") setError("Something went wrong. Try again!"); }
     setLoadingOptions(false);
   };
 
@@ -818,7 +818,7 @@ export default function App() {
       fetchImage(parsed.name);
       const newHistory=[{...parsed,cuisine,timestamp:Date.now()},...history].slice(0,10);
       setHistory(newHistory);
-    } catch(err){ if(err.message!=="rate_limit") setError("Something went wrong. Try again!"); }
+    } catch(err){ console.error("Request error:", err); if(err.message!=="rate_limit") setError("Something went wrong. Try again!"); }
     setLoading(false);
   };
 
@@ -867,7 +867,7 @@ export default function App() {
       const imgs={};
       for(const r of restaurantData){for(const dish of(r.menu||[]).slice(0,4)){if(!imgs[dish]){const img=await fetchDishImage(dish);if(img)imgs[dish]=img;}}}
       setDishImages(imgs);
-    } catch(err){ if(err.message!=="rate_limit") setError("Something went wrong. Try again!"); }
+    } catch(err){ console.error("Request error:", err); if(err.message!=="rate_limit") setError("Something went wrong. Try again!"); }
     setLoading(false);
   };
 

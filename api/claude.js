@@ -69,32 +69,54 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: maxTokens,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
+    // Ask Claude; if the reply is cut off or isn't valid JSON, retry once with more room.
+    let text = null;
+    let lastProblem = "";
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": key,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: attempt === 0 ? maxTokens : Math.round(maxTokens * 1.6),
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
 
-    const data = await response.json();
-    
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data.error?.message || "API error" });
+      const data = await response.json();
+
+      if (!response.ok) {
+        return res.status(response.status).json({ error: data.error?.message || "API error" });
+      }
+
+      let raw = (data.content || []).map(i => i.text || "").join("").replace(/```json|```/g, "").trim();
+
+      // Keep only the JSON part, in case the model added text before or after it
+      const first = raw.indexOf("{");
+      const last = raw.lastIndexOf("}");
+      if (first !== -1 && last > first) raw = raw.slice(first, last + 1);
+
+      try {
+        JSON.parse(raw);
+        text = raw;
+        break;
+      } catch (e) {
+        lastProblem = data.stop_reason === "max_tokens" ? "reply cut off" : "reply was not valid JSON";
+        console.error("Claude reply problem (attempt " + (attempt + 1) + "):", lastProblem);
+      }
     }
 
-    const text = data.content.map(i => i.text || "").join("").replace(/```json|```/g, "").trim();
+    if (!text) {
+      return res.status(502).json({ error: "bad_reply", message: "Could not read the AI reply (" + lastProblem + "). Please try again." });
+    }
 
-    // Cache the response
+    // Cache only replies that are valid JSON
     if (!skipCache) {
       cache.set(cacheKey, { text, timestamp: Date.now() });
-      // Clean old cache entries if too large
       if (cache.size > 500) {
         const oldest = [...cache.entries()].sort((a,b) => a[1].timestamp - b[1].timestamp)[0];
         cache.delete(oldest[0]);
